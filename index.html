@@ -244,6 +244,12 @@
   select#akKitSelect{border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14px;background:#fbfbfd;}
   .kit-tipo-badge{background:var(--blue);color:#fff;font-size:11.5px;font-weight:600;padding:2px 9px;border-radius:20px;}
 
+  .orc-linha{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--border);font-size:14.5px;}
+  .orc-linha span:first-child{color:var(--text);}
+  .orc-linha span:last-child{font-weight:600;color:var(--text);}
+  .orc-total{border-bottom:none;border-top:2px solid var(--header);margin-top:4px;padding-top:14px;font-size:17px;}
+  .orc-total span{font-weight:800;color:var(--header);}
+
   .tipo-pessoa-badge{font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px;background:#E3E6F7;color:var(--blue);}
   .filtro-tabs{display:flex;gap:6px;margin-bottom:18px;}
   .filtro-tab{padding:8px 16px;border-radius:9px;border:1px solid var(--border);background:#fff;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;}
@@ -348,7 +354,7 @@
 
 <footer class="fenix-footer">
   <div><strong>&lt;Cristiano Fênix/&gt;</strong> · <a href="https://wa.me/5579999680880" target="_blank" rel="noopener">Fênix Soluções Tecnológicas</a> · <a href="https://instagram.com/fenixsolucoestecnologicas" target="_blank" rel="noopener">@fenixsolucoestecnologicas</a></div>
-  <div style="margin-top:4px;">Fênix Ativos v2.4</div>
+  <div style="margin-top:4px;">Fênix Ativos v2.5</div>
 </footer>
 
 <!-- MODAL: Solução -->
@@ -363,6 +369,10 @@
     <div class="form-row">
       <label>Descrição (opcional)</label>
       <textarea id="msDesc" rows="2" placeholder="Observações gerais sobre esta solução"></textarea>
+    </div>
+    <div class="form-row">
+      <label>Valor de Instalação/Mão de obra (opcional — usado no Orçamento do Cliente)</label>
+      <input type="text" id="msInstalacao" placeholder="R$ 0,00" oninput="maskMoeda(this)">
     </div>
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeModal('modalSolucao')">Cancelar</button>
@@ -412,9 +422,13 @@
           <label>Código do Fabricante</label>
           <input type="text" id="maCodigo" placeholder="Ex.: código/SKU/part number do produto">
         </div>
-        <div class="form-row" style="grid-column:1/-1;">
+        <div class="form-row">
           <label>Número de Série</label>
           <input type="text" id="maSerie" placeholder="Número de série do equipamento">
+        </div>
+        <div class="form-row" style="grid-column:1/-1;">
+          <label>Preço de venda (opcional — usado no Orçamento do Cliente)</label>
+          <input type="text" id="maPreco" placeholder="R$ 0,00" oninput="maskMoeda(this)">
         </div>
       </div>
       <div class="form-row">
@@ -447,6 +461,19 @@
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeModal('modalTipo')">Cancelar</button>
       <button class="btn btn-primary" onclick="salvarTipo()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Orçamento do Cliente (sem detalhe técnico) -->
+<div class="overlay" id="modalOrcamentoCliente">
+  <div class="modal">
+    <h2 id="ocTitulo">Orçamento</h2>
+    <p class="hint">Versão para o cliente — sem marca, modelo, série ou detalhes técnicos.</p>
+    <div id="ocConteudo"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modalOrcamentoCliente')">Fechar</button>
+      <button class="btn btn-primary" onclick="exportarOrcamentoPDF()">Exportar PDF</button>
     </div>
   </div>
 </div>
@@ -962,7 +989,8 @@ var state = {
   aplicarSolucoesClienteId: null,
   online: navigator.onLine,
   usuarioLogado: null,
-  modoLogin: 'entrar' // 'entrar' | 'criar'
+  modoLogin: 'entrar', // 'entrar' | 'criar'
+  orcamentoAtual: null
 };
 
 /* ===================== NAV: TOPO (Dashboard / Soluções / Kits / Tipos / Clientes / Chamados) ===================== */
@@ -1398,6 +1426,7 @@ function renderDetalheSolucao(solucaoId){
   html += '  </div>';
   html += '  <div style="display:flex;gap:8px;flex-wrap:wrap;">';
   html += '    <button class="btn btn-ghost" onclick="exportarSolucaoPDF(\''+solucaoId+'\')">Exportar PDF</button>';
+  html += '    <button class="btn btn-ghost" onclick="abrirOrcamentoCliente(\''+solucaoId+'\')">Orçamento do Cliente</button>';
   html += '    <button class="btn btn-primary" onclick="openNovoAtivo(\''+solucaoId+'\', null)">+ Novo Ativo</button>';
   html += '  </div>';
   html += '</div>';
@@ -1455,6 +1484,7 @@ function renderAtivoNode(ativo, todosAtivos, visibleIds, termo){
   if(ativo.codigoFabricante) metaParts.push('<span><b>Cód. Fabricante:</b> '+highlightText(ativo.codigoFabricante, termo)+'</span>');
   if(ativo.serie) metaParts.push('<span><b>Nº de Série:</b> '+highlightText(ativo.serie, termo)+'</span>');
   if(ativo.localizacao) metaParts.push('<span><b>Local:</b> '+highlightText(ativo.localizacao, termo)+'</span>');
+  if(ativo.precoVenda) metaParts.push('<span><b>Preço:</b> '+formatarMoeda(ativo.precoVenda)+'</span>');
 
   var html = '<div class="ativo-node">';
   html += '  <div class="ativo-card" data-ativo-id="'+ativo.id+'" ondragover="dragOverAtivo(event)" ondragleave="dragLeaveAtivo(event)" ondrop="dropAtivo(event,\''+ativo.id+'\')">';
@@ -1608,6 +1638,7 @@ function openNovaSolucao(){
   document.getElementById('msTitle').textContent = 'Nova Solução';
   document.getElementById('msNome').value = '';
   document.getElementById('msDesc').value = '';
+  document.getElementById('msInstalacao').value = '';
   openModal('modalSolucao');
 }
 function openEditarSolucao(id){
@@ -1617,20 +1648,22 @@ function openEditarSolucao(id){
   document.getElementById('msTitle').textContent = 'Editar Solução';
   document.getElementById('msNome').value = s.nome;
   document.getElementById('msDesc').value = s.descricao || '';
+  document.getElementById('msInstalacao').value = s.valorInstalacao ? formatarMoeda(s.valorInstalacao).replace('R$','').trim() : '';
   openModal('modalSolucao');
 }
 function salvarSolucao(){
   var nome = document.getElementById('msNome').value.trim();
   var desc = document.getElementById('msDesc').value.trim();
+  var valorInstalacao = moedaParaNumero(document.getElementById('msInstalacao').value);
   if(!nome){ showToast('Informe o nome da solução.'); return; }
   var solucoes = loadSolucoes();
   var registro;
   if(state.editingSolucaoId){
     var s = solucoes.find(function(x){ return x.id===state.editingSolucaoId; });
-    s.nome = nome; s.descricao = desc;
+    s.nome = nome; s.descricao = desc; s.valorInstalacao = valorInstalacao;
     registro = s;
   } else {
-    registro = { id: uid(), nome: nome, descricao: desc, criadoEm: new Date().toISOString() };
+    registro = { id: uid(), nome: nome, descricao: desc, valorInstalacao: valorInstalacao, criadoEm: new Date().toISOString() };
     solucoes.push(registro);
   }
   saveSolucoes(solucoes);
@@ -2294,6 +2327,7 @@ function openNovoAtivo(solucaoId, paiId){
   document.getElementById('maMarca').value = '';
   document.getElementById('maModelo').value = '';
   document.getElementById('maCodigo').value = '';
+  document.getElementById('maPreco').value = '';
   document.getElementById('maSerie').value = '';
   document.getElementById('maOutrosWrap').innerHTML = '';
   document.getElementById('maEssentialHint').style.display = '';
@@ -2315,6 +2349,7 @@ function openEditarAtivo(id){
   document.getElementById('maMarca').value = a.marca || '';
   document.getElementById('maModelo').value = a.modelo || '';
   document.getElementById('maCodigo').value = a.codigoFabricante || '';
+  document.getElementById('maPreco').value = a.precoVenda ? formatarMoeda(a.precoVenda).replace('R$','').trim() : '';
   document.getElementById('maSerie').value = a.serie || '';
   document.getElementById('maOutrosWrap').innerHTML = '';
   (a.outros||[]).forEach(function(o){ addOutroRow(o.nome, o.valor); });
@@ -2362,6 +2397,7 @@ function salvarAtivo(){
     marca: document.getElementById('maMarca').value.trim(),
     modelo: document.getElementById('maModelo').value.trim(),
     codigoFabricante: document.getElementById('maCodigo').value.trim(),
+    precoVenda: moedaParaNumero(document.getElementById('maPreco').value),
     serie: document.getElementById('maSerie').value.trim(),
     outros: outros
   };
@@ -2634,7 +2670,132 @@ function exportarSolucaoPDF(solucaoId){
   doc.save(nomeArquivo);
 }
 
+/* ===================== ORÇAMENTO DO CLIENTE (sem detalhe técnico) ===================== */
+function abrirOrcamentoCliente(solucaoId){
+  var solucao = loadSolucoes().find(function(s){ return s.id===solucaoId; });
+  if(!solucao) return;
+  var todosAtivos = loadAtivos().filter(function(a){ return a.solucaoId===solucaoId; });
+  var raizes = todosAtivos.filter(function(a){ return !a.paiId; }).sort(byOrdem);
+
+  var linhas = raizes.map(function(r){
+    return { nome: r.identificacao || r.tipo || 'Item', total: precoTotalNode(r, todosAtivos) };
+  });
+  var instalacao = solucao.valorInstalacao || 0;
+  var totalGeral = linhas.reduce(function(acc,l){ return acc + l.total; }, 0) + instalacao;
+
+  var html = '';
+  if(linhas.length === 0){
+    html += '<p class="hint">Nenhum item nesta solução ainda.</p>';
+  } else {
+    linhas.forEach(function(l){
+      html += '<div class="orc-linha"><span>'+escapeHtml(l.nome)+'</span><span>'+formatarMoeda(l.total)+'</span></div>';
+    });
+    if(instalacao > 0){
+      html += '<div class="orc-linha"><span>Instalação</span><span>'+formatarMoeda(instalacao)+'</span></div>';
+    }
+    html += '<div class="orc-linha orc-total"><span>Total</span><span>'+formatarMoeda(totalGeral)+'</span></div>';
+  }
+
+  document.getElementById('ocTitulo').textContent = 'Orçamento — ' + solucao.nome;
+  document.getElementById('ocConteudo').innerHTML = html;
+  state.orcamentoAtual = { nomeSolucao: solucao.nome, linhas: linhas, instalacao: instalacao, total: totalGeral, clienteId: solucao.clienteId || null };
+  openModal('modalOrcamentoCliente');
+}
+
+function exportarOrcamentoPDF(){
+  if(typeof window.jspdf === 'undefined'){ showToast('Não foi possível carregar o gerador de PDF. Verifique sua conexão com a internet.'); return; }
+  var orc = state.orcamentoAtual;
+  if(!orc) return;
+
+  var clienteNome = '';
+  if(orc.clienteId){
+    var cliente = loadClientes().find(function(c){ return c.id===orc.clienteId; });
+    if(cliente) clienteNome = nomeExibicaoCliente(cliente);
+  }
+
+  var jsPDFCtor = window.jspdf.jsPDF;
+  var doc = new jsPDFCtor({ unit:'mm', format:'a4' });
+  var pageW = doc.internal.pageSize.getWidth();
+  var pageH = doc.internal.pageSize.getHeight();
+  var marginL = 18, marginR = 18, y = 24;
+
+  doc.setFontSize(18);
+  doc.setTextColor(4,18,115);
+  doc.text('Orçamento', marginL, y); y += 8;
+  doc.setFontSize(12);
+  doc.setTextColor(2,7,51);
+  doc.text(orc.nomeSolucao, marginL, y); y += 6;
+  if(clienteNome){
+    doc.setFontSize(10.5);
+    doc.setTextColor(107,111,140);
+    doc.text('Cliente: ' + clienteNome, marginL, y); y += 6;
+  }
+  doc.setFontSize(9.5);
+  doc.setTextColor(107,111,140);
+  doc.text(new Date().toLocaleDateString('pt-BR'), marginL, y); y += 8;
+  doc.setDrawColor(225,227,239);
+  doc.line(marginL, y, pageW - marginR, y); y += 10;
+
+  doc.setFontSize(11.5);
+  orc.linhas.forEach(function(l){
+    doc.setTextColor(2,7,51);
+    doc.text(l.nome, marginL, y);
+    doc.setFont(undefined,'bold');
+    doc.text(formatarMoeda(l.total), pageW - marginR, y, { align:'right' });
+    doc.setFont(undefined,'normal');
+    y += 8;
+  });
+  if(orc.instalacao > 0){
+    doc.setTextColor(2,7,51);
+    doc.text('Instalação', marginL, y);
+    doc.setFont(undefined,'bold');
+    doc.text(formatarMoeda(orc.instalacao), pageW - marginR, y, { align:'right' });
+    doc.setFont(undefined,'normal');
+    y += 8;
+  }
+  y += 3;
+  doc.setDrawColor(4,18,115);
+  doc.setLineWidth(0.6);
+  doc.line(marginL, y, pageW - marginR, y); y += 9;
+  doc.setLineWidth(0.2);
+
+  doc.setFontSize(15);
+  doc.setTextColor(4,18,115);
+  doc.setFont(undefined,'bold');
+  doc.text('Total', marginL, y);
+  doc.text(formatarMoeda(orc.total), pageW - marginR, y, { align:'right' });
+  doc.setFont(undefined,'normal');
+
+  doc.setFontSize(8);
+  doc.setTextColor(150,150,170);
+  doc.text('Fênix Soluções Tecnológicas', marginL, pageH - 10);
+
+  var nomeArquivo = 'Orcamento_' + orc.nomeSolucao.replace(/[^a-zA-Z0-9]+/g,'_') + '.pdf';
+  doc.save(nomeArquivo);
+}
+
 /* ===================== UTIL ===================== */
+function maskMoeda(el){
+  var digits = el.value.replace(/\D/g,'');
+  if(!digits){ el.value=''; return; }
+  var num = parseInt(digits,10)/100;
+  el.value = num.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+function moedaParaNumero(str){
+  if(!str) return 0;
+  var limpo = String(str).replace(/\./g,'').replace(',', '.').replace(/[^\d.]/g,'');
+  return parseFloat(limpo) || 0;
+}
+function formatarMoeda(num){
+  return (num||0).toLocaleString('pt-BR', { style:'currency', currency:'BRL' });
+}
+function precoTotalNode(ativo, todosAtivos){
+  var precoUnit = ativo.precoVenda || 0;
+  var qtd = ativo.quantidade || 1;
+  var filhos = todosAtivos.filter(function(a){ return a.paiId === ativo.id; });
+  var totalFilhos = filhos.reduce(function(acc, f){ return acc + precoTotalNode(f, todosAtivos); }, 0);
+  return (precoUnit * qtd) + totalFilhos;
+}
 function escapeHtml(str){
   if(str === undefined || str === null) return '';
   return String(str).replace(/[&<>"']/g, function(c){
