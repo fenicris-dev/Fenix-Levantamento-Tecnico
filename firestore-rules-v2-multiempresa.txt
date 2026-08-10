@@ -1,0 +1,48 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function autenticado() {
+      return request.auth != null;
+    }
+
+    // Empresa do usuário logado (lê o vínculo dele em usuarios_empresa)
+    function empresaDoUsuario() {
+      return get(/databases/$(database)/documents/usuarios_empresa/$(request.auth.uid)).data.empresaId;
+    }
+    function pertenceAEmpresa(empresaId) {
+      return autenticado()
+        && exists(/databases/$(database)/documents/usuarios_empresa/$(request.auth.uid))
+        && empresaDoUsuario() == empresaId;
+    }
+
+    // ---------- Empresas ----------
+    // Qualquer autenticado pode ler (precisa pra conferir nome/código) e
+    // criar uma empresa nova. Não permite editar/apagar pelo app por
+    // enquanto (evita alguém apagar a empresa de outra pessoa).
+    match /empresas/{empresaId} {
+      allow read: if autenticado();
+      allow create: if autenticado();
+      allow update, delete: if false;
+    }
+
+    // ---------- Vínculo usuário -> empresa ----------
+    // Cada usuário só lê/escreve o próprio vínculo.
+    match /usuarios_empresa/{uid} {
+      allow read, write: if autenticado() && request.auth.uid == uid;
+    }
+
+    // ---------- Dados de cada empresa (isolados) ----------
+    match /empresas/{empresaId}/{tipoColecao}/{docId} {
+      allow read, write: if pertenceAEmpresa(empresaId);
+    }
+    match /empresas/{empresaId}/cidades/{codigoIBGE} {
+      allow read: if pertenceAEmpresa(empresaId);
+      allow write: if false;
+      match /bairros/{bairroId} {
+        allow read: if pertenceAEmpresa(empresaId);
+        allow write: if pertenceAEmpresa(empresaId);
+      }
+    }
+  }
+}
