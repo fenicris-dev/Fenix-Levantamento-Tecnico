@@ -232,8 +232,9 @@
   .toolbar-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:18px;}
   mark{background:#F7EFB8;color:inherit;border-radius:3px;padding:0 1px;}
 
-  .kititem-editrow{display:flex;gap:8px;align-items:center;margin-bottom:8px;}
-  .kititem-editrow .kiNome{flex:1;}
+  .kititem-editrow{display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap;}
+  .kititem-editrow .kiNome{flex:1;min-width:140px;}
+  .kititem-editrow .kiTipo{width:130px;flex-shrink:0;}
   .kititem-editrow .kiQtd{width:64px;flex-shrink:0;}
   .kiVarLabel{font-size:11.5px;display:flex;align-items:center;gap:4px;white-space:nowrap;color:var(--muted);flex-shrink:0;}
   .kititem-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);}
@@ -282,9 +283,17 @@
 
   footer.fenix-footer{
     margin-left:216px;padding:22px 26px 26px;text-align:center;color:var(--muted);font-size:12px;
+    display:none;
   }
   footer.fenix-footer a{color:var(--blue);font-weight:600;text-decoration:none;}
-  @media (max-width:820px){ footer.fenix-footer{margin-left:0;padding-bottom:80px;} }
+  @media (max-width:820px){ footer.fenix-footer{display:block;margin-left:0;padding-bottom:80px;} }
+  .sidebar-footer{
+    margin-top:auto;padding:14px 16px 6px;border-top:1px solid rgba(255,255,255,0.1);
+    font-size:10.5px;color:#9aa0d6;line-height:1.6;
+  }
+  .sidebar-footer a{color:#c7cbef;text-decoration:none;}
+  .sidebar-footer a:hover{text-decoration:underline;}
+  .sidebar-footer .versao{margin-top:5px;opacity:.65;}
 
   .toast{
     position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);
@@ -339,7 +348,13 @@
     <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3v5h5"/><path d="M6 3h8l6 6v11a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/></svg>
     Chamados
   </div>
-  <div class="nav-item disabled"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg>Relatórios<span class="tag">em breve</span></div>
+  <div class="nav-item" data-section="relatorios" onclick="irParaRelatorios()"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg>Relatórios</div>
+  <div class="sidebar-footer">
+    <div><strong>&lt;Cristiano Fênix/&gt;</strong></div>
+    <div><a href="https://wa.me/5579999680880" target="_blank" rel="noopener">Fênix Soluções Tecnológicas</a></div>
+    <div><a href="https://instagram.com/fenixsolucoestecnologicas" target="_blank" rel="noopener">@fenixsolucoestecnologicas</a></div>
+    <div class="versao">Fênix Ativos v3.3</div>
+  </div>
 </nav>
 
 <main id="app"></main>
@@ -354,7 +369,7 @@
 
 <footer class="fenix-footer">
   <div><strong>&lt;Cristiano Fênix/&gt;</strong> · <a href="https://wa.me/5579999680880" target="_blank" rel="noopener">Fênix Soluções Tecnológicas</a> · <a href="https://instagram.com/fenixsolucoestecnologicas" target="_blank" rel="noopener">@fenixsolucoestecnologicas</a></div>
-  <div style="margin-top:4px;">Fênix Ativos v2.5</div>
+  <div style="margin-top:4px;">Fênix Ativos v3.3</div>
 </footer>
 
 <!-- MODAL: Solução -->
@@ -420,7 +435,7 @@
         </div>
         <div class="form-row">
           <label>Código do Fabricante</label>
-          <input type="text" id="maCodigo" placeholder="Ex.: código/SKU/part number do produto">
+          <input type="text" id="maCodigo" list="dlCodigosFabricante" placeholder="Ex.: código/SKU/part number do produto" onblur="preencherDoMaterial(this.value)">
         </div>
         <div class="form-row">
           <label>Número de Série</label>
@@ -448,6 +463,7 @@
 <datalist id="dlMarcas"></datalist>
 <datalist id="dlModelos"></datalist>
 <datalist id="dlLocalizacoes"></datalist>
+<datalist id="dlCodigosFabricante"></datalist>
 
 <!-- MODAL: Tipo (criar/renomear) -->
 <div class="overlay" id="modalTipo">
@@ -497,6 +513,30 @@
         <button class="btn btn-ghost" onclick="closeModal('modalLogin')">Agora não</button>
         <button class="btn btn-primary" id="mlSubmitBtn" onclick="fazerLoginFenix()">Entrar</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Cadastro/Entrada de Empresa (primeiro acesso) -->
+<div class="overlay" id="modalEmpresa">
+  <div class="modal">
+    <h2>Bem-vindo ao Fênix Core</h2>
+    <p class="hint">Primeiro acesso — sua conta ainda não está vinculada a nenhuma empresa. Crie a sua, ou entre numa já existente com o código que o responsável te passou.</p>
+    <div class="filtro-tabs">
+      <div class="filtro-tab" id="tabCriarEmpresa" onclick="setModoEmpresa('criar')">Criar minha empresa</div>
+      <div class="filtro-tab" id="tabEntrarEmpresa" onclick="setModoEmpresa('entrar')">Já tenho um código</div>
+    </div>
+    <div id="blocoCriarEmpresa" class="form-row">
+      <label>Nome da Empresa</label>
+      <input type="text" id="meNomeEmpresa" placeholder="Ex.: Fênix Soluções Tecnológicas">
+    </div>
+    <div id="blocoEntrarEmpresa" class="form-row hidden">
+      <label>Código da Empresa</label>
+      <input type="text" id="meCodigoEmpresa" placeholder="Ex.: AB12CD" maxlength="6" style="text-transform:uppercase;">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modalEmpresa')">Agora não</button>
+      <button class="btn btn-primary" onclick="confirmarCadastroEmpresa()">Continuar</button>
     </div>
   </div>
 </div>
@@ -627,8 +667,14 @@
       </div>
       <div class="form-row">
         <label>Solução (opcional)</label>
-        <select id="mhSolucao">
+        <select id="mhSolucao" onchange="onChangeSolucaoChamado()">
           <option value="">— Nenhuma em específico —</option>
+        </select>
+      </div>
+      <div class="form-row" style="grid-column:1/-1;">
+        <label>Ativo específico (opcional)</label>
+        <select id="mhAtivo">
+          <option value="">— Chamado geral da solução —</option>
         </select>
       </div>
     </div>
@@ -732,14 +778,31 @@
   </div>
 </div>
 
+<input type="file" id="inputBackupFile" accept=".json,application/json" style="display:none" onchange="onArquivoBackupSelecionado(event)">
+
+<!-- MODAL: Confirmar importação de backup -->
+<div class="overlay" id="modalImportarBackup">
+  <div class="modal">
+    <h2>Importar backup</h2>
+    <div class="danger-box" id="ibResumo"></div>
+    <div class="form-row">
+      <label>Digite <b>SUBSTITUIR</b> para confirmar</label>
+      <input type="text" id="ibConfirmInput" placeholder="SUBSTITUIR" oninput="checkImportarBackupWord()">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modalImportarBackup')">Cancelar</button>
+      <button class="btn btn-danger" id="ibConfirmBtn" disabled onclick="confirmarImportarBackup()">Substituir dados locais</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-  import { FenixCore } from "https://fenicris-dev.github.io/Fenix-Levantamento-Tecnico/fenix-core-v1.4.js";
+  import { FenixCore } from "https://fenicris-dev.github.io/Fenix-Levantamento-Tecnico/fenix-core-v1.5.js";
 
   var firebaseConfig = {
     apiKey: "AIzaSyDU8pGPVrBOS75Fry9FB3H5nokw6Qk5wpA",
@@ -751,43 +814,43 @@
   };
 
   try{
-    var app = initializeApp(firebaseConfig);
-    var db = getFirestore(app);
+    var nucleo = FenixCore.initFirebase(firebaseConfig);
+    window.fenixEmpresas = FenixCore.criarModuloEmpresas(nucleo.db);
 
+    // fenixCloud existe desde já, mas só grava/lê depois que a empresa for
+    // resolvida (definirEmpresa) — antes disso fica em modo local puro.
+    var appDataAtual = null;
     window.fenixCloud = {
       salvar: function(chave, arr){
-        return setDoc(doc(db, 'fenixAtivos', chave), { items: arr, atualizadoEm: new Date().toISOString() })
-          .then(function(){ return true; })
-          .catch(function(err){ console.warn('Fênix Cloud: falha ao salvar "'+chave+'":', err); return false; });
+        if(!appDataAtual) return Promise.resolve(false);
+        return appDataAtual.salvar(chave, arr);
       },
       carregar: function(chave){
-        return getDoc(doc(db, 'fenixAtivos', chave))
-          .then(function(snap){ return snap.exists() ? (snap.data().items || []) : null; })
-          .catch(function(err){ console.warn('Fênix Cloud: falha ao carregar "'+chave+'":', err); return null; });
+        if(!appDataAtual) return Promise.resolve(null);
+        return appDataAtual.carregar(chave);
       }
     };
-    window.dispatchEvent(new Event('fenixCloudReady'));
-  }catch(err){
-    console.warn('Fênix Cloud indisponível:', err);
-  }
-
-  try{
-    var nucleo = FenixCore.initFirebase(firebaseConfig); // reaproveita o app já iniciado acima
-    window.fenixPessoas = FenixCore.criarModuloPessoas(nucleo.db);
-    window.fenixProdutosServicos = FenixCore.criarModuloProdutosServicos(nucleo.db);
-    window.fenixFamiliasMateriais = FenixCore.criarModuloFamiliasMateriais(nucleo.db);
-    window.fenixMateriais = FenixCore.criarModuloMateriais(nucleo.db);
 
     window.fenixAuth = FenixCore.criarModuloAuth(nucleo.app);
     window.fenixAuth.aoMudarEstado(function(usuario){
       window.dispatchEvent(new CustomEvent('fenixAuthChanged', {
-        detail: { logado: !!usuario, email: usuario ? usuario.email : null }
+        detail: { logado: !!usuario, email: usuario ? usuario.email : null, uid: usuario ? usuario.uid : null }
       }));
     });
 
-    window.dispatchEvent(new Event('fenixCoreReady'));
+    // Chamado pela tela de cadastro/entrada de empresa, depois que o
+    // empresaId é conhecido — monta todos os módulos de dados isolados.
+    window.fenixDefinirEmpresa = function(empresaId){
+      appDataAtual = FenixCore.criarModuloAppData(nucleo.db, empresaId, 'fenixAtivosApp');
+      window.fenixPessoas = FenixCore.criarModuloPessoas(nucleo.db, empresaId);
+      window.fenixProdutosServicos = FenixCore.criarModuloProdutosServicos(nucleo.db, empresaId);
+      window.fenixFamiliasMateriais = FenixCore.criarModuloFamiliasMateriais(nucleo.db, empresaId);
+      window.fenixMateriais = FenixCore.criarModuloMateriais(nucleo.db, empresaId);
+      window.dispatchEvent(new Event('fenixCloudReady'));
+      window.dispatchEvent(new Event('fenixCoreReady'));
+    };
   }catch(err){
-    console.warn('Fênix Core indisponível — Cliente segue só local/mirror:', err);
+    console.warn('Fênix Core indisponível — app segue só local:', err);
   }
 </script>
 
@@ -817,9 +880,46 @@ function loadChamados(){ try{ return JSON.parse(localStorage.getItem(LS_CHAMADOS
 function saveChamados(arr){ localStorage.setItem(LS_CHAMADOS, JSON.stringify(arr)); cloudMirror('chamados', arr); }
 
 /* ===================== NUVEM (Firebase) + STATUS ONLINE/OFFLINE ===================== */
-function cloudMirror(chave, arr){
+var LS_FILA_SYNC = 'fenixAtivos_v1_filasync';
+function loadFilaSync(){ try{ return JSON.parse(localStorage.getItem(LS_FILA_SYNC)) || {}; }catch(e){ return {}; } }
+function saveFilaSync(obj){ localStorage.setItem(LS_FILA_SYNC, JSON.stringify(obj)); atualizarBadgePendencias(); }
+function enfileirarSync(chave, arr){
+  var fila = loadFilaSync();
+  fila[chave] = arr;
+  saveFilaSync(fila);
+}
+function removerDaFilaSync(chave){
+  var fila = loadFilaSync();
+  if(fila.hasOwnProperty(chave)){ delete fila[chave]; saveFilaSync(fila); }
+}
+function tentarEsvaziarFilaSync(){
   if(!state.online || !window.fenixCloud) return;
-  window.fenixCloud.salvar(chave, arr);
+  var fila = loadFilaSync();
+  var chaves = Object.keys(fila);
+  if(chaves.length === 0) return;
+  chaves.forEach(function(chave){
+    window.fenixCloud.salvar(chave, fila[chave]).then(function(ok){
+      if(ok) removerDaFilaSync(chave);
+    });
+  });
+}
+function atualizarBadgePendencias(){
+  var n = Object.keys(loadFilaSync()).length;
+  var el = document.getElementById('statusConexao');
+  if(!el) return;
+  var base = state.online ? '● Online' : '● Offline';
+  el.textContent = n > 0 ? (base + ' · ' + n + ' pend.') : base;
+  el.title = n > 0 ? (n + ' item(ns) aguardando sincronizar com a nuvem') : '';
+}
+function cloudMirror(chave, arr){
+  if(!state.online || !window.fenixCloud){
+    enfileirarSync(chave, arr);
+    return;
+  }
+  window.fenixCloud.salvar(chave, arr).then(function(ok){
+    if(ok){ removerDaFilaSync(chave); }
+    else{ enfileirarSync(chave, arr); }
+  });
 }
 function sincronizarTudoParaNuvem(){
   if(!window.fenixCloud) return;
@@ -830,17 +930,20 @@ function sincronizarTudoParaNuvem(){
   cloudMirror('tipos', loadTipos());
   cloudMirror('clientes', loadClientes());
   cloudMirror('chamados', loadChamados());
+  tentarEsvaziarFilaSync();
 }
 function updateOnlineStatus(){
   state.online = navigator.onLine;
   var el = document.getElementById('statusConexao');
   if(!el) return;
   el.className = 'status-conexao ' + (state.online ? 'online' : 'offline');
-  el.textContent = state.online ? '● Online' : '● Offline';
+  atualizarBadgePendencias();
 }
-window.addEventListener('online', function(){ updateOnlineStatus(); sincronizarTudoParaNuvem(); showToast('Conexão restabelecida — sincronizando com a nuvem.'); });
+window.addEventListener('online', function(){ updateOnlineStatus(); tentarEsvaziarFilaSync(); sincronizarTudoParaNuvem(); showToast('Conexão restabelecida — sincronizando com a nuvem.'); });
 window.addEventListener('offline', function(){ updateOnlineStatus(); showToast('Sem conexão — trabalhando localmente. Os dados sincronizam quando voltar o sinal.'); });
+setInterval(function(){ if(state.online) tentarEsvaziarFilaSync(); }, 60000);
 window.addEventListener('fenixCloudReady', function(){
+  tentarEsvaziarFilaSync();
   if(!navigator.onLine) return;
   var vazio = loadSolucoes().length===0 && loadAtivos().length===0 && loadKits().length===0 && loadItensKit().length===0 && loadTipos().length===0 && loadClientes().length===0 && loadChamados().length===0;
   if(!vazio) return;
@@ -866,6 +969,8 @@ window.addEventListener('fenixCloudReady', function(){
 });
 
 window.addEventListener('fenixCoreReady', function(){
+  sincronizarTudoParaNuvem();
+  atualizarCacheMateriais();
   if(!navigator.onLine || !window.fenixPessoas) return;
   window.fenixPessoas.listar().then(function(pessoas){
     if(!pessoas || !pessoas.length) return;
@@ -917,15 +1022,38 @@ window.addEventListener('fenixAuthChanged', function(e){
   }
   if(e.detail.logado){
     closeModal('modalLogin');
-    showToast('Conectado ao Fênix Core como ' + e.detail.email + '.');
-    sincronizarTudoParaNuvem();
-    window.dispatchEvent(new Event('fenixCoreReady'));
+    if(!window.fenixEmpresas){ showToast('Conectado, mas o Fênix Core está indisponível no momento.'); return; }
+    window.fenixEmpresas.obterEmpresaDoUsuario(e.detail.uid).then(function(vinculo){
+      if(vinculo){
+        state.empresaId = vinculo.empresaId;
+        window.fenixDefinirEmpresa(vinculo.empresaId);
+        return window.fenixEmpresas.obterEmpresa(vinculo.empresaId);
+      } else {
+        abrirCadastroEmpresa();
+        return null;
+      }
+    }).then(function(empresa){
+      if(empresa){
+        state.empresaNome = empresa.nome;
+        showToast('Conectado como ' + e.detail.email + ' — empresa ' + state.empresaNome + '.');
+      }
+      render();
+    }).catch(function(err){
+      console.warn('Fênix Core: falha ao resolver empresa do usuário:', err);
+      showToast('Não foi possível verificar sua empresa. Tente novamente.');
+    });
+  } else {
+    state.empresaId = null;
+    state.empresaNome = '';
   }
 });
 function onClickStatusUsuario(){
   if(state.usuarioLogado){
-    if(window.fenixAuth) window.fenixAuth.sair();
-    showToast('Você saiu do Fênix Core. Continua tudo salvo localmente.');
+    var sair = confirm('Logado como ' + state.usuarioLogado + (state.empresaNome ? (' — empresa ' + state.empresaNome) : '') + '.\n\nSair da conta?');
+    if(sair){
+      if(window.fenixAuth) window.fenixAuth.sair();
+      showToast('Você saiu do Fênix Core. Continua tudo salvo localmente.');
+    }
     return;
   }
   if(!window.fenixAuth){ showToast('Fênix Core indisponível no momento.'); return; }
@@ -967,6 +1095,51 @@ function fazerLoginFenix(){
   });
 }
 
+/* ===================== EMPRESA (multi-empresa) ===================== */
+function abrirCadastroEmpresa(){
+  setModoEmpresa('criar');
+  document.getElementById('meNomeEmpresa').value = '';
+  document.getElementById('meCodigoEmpresa').value = '';
+  openModal('modalEmpresa');
+}
+function setModoEmpresa(modo){
+  state.modoEmpresa = modo;
+  document.getElementById('tabCriarEmpresa').classList.toggle('active', modo==='criar');
+  document.getElementById('tabEntrarEmpresa').classList.toggle('active', modo==='entrar');
+  document.getElementById('blocoCriarEmpresa').classList.toggle('hidden', modo!=='criar');
+  document.getElementById('blocoEntrarEmpresa').classList.toggle('hidden', modo!=='entrar');
+}
+function confirmarCadastroEmpresa(){
+  if(!window.fenixEmpresas || !window.fenixAuth || !window.fenixAuth.usuarioAtual()){
+    showToast('Não foi possível identificar sua conta. Tente entrar de novo.');
+    return;
+  }
+  var usuario = window.fenixAuth.usuarioAtual();
+  if(state.modoEmpresa === 'criar'){
+    var nome = document.getElementById('meNomeEmpresa').value.trim();
+    if(!nome){ showToast('Informe o nome da empresa.'); return; }
+    window.fenixEmpresas.criarEmpresa(usuario.uid, usuario.email, nome).then(function(empresa){
+      state.empresaId = empresa.id;
+      state.empresaNome = empresa.nome;
+      window.fenixDefinirEmpresa(empresa.id);
+      closeModal('modalEmpresa');
+      showToast('Empresa "' + empresa.nome + '" criada! Código pra sua equipe entrar: ' + empresa.id);
+      render();
+    }).catch(function(err){ showToast('Não foi possível criar a empresa: ' + (err.message||err)); });
+  } else {
+    var codigo = document.getElementById('meCodigoEmpresa').value.trim().toUpperCase();
+    if(!codigo){ showToast('Informe o código da empresa.'); return; }
+    window.fenixEmpresas.entrarComCodigo(usuario.uid, usuario.email, codigo).then(function(empresa){
+      state.empresaId = empresa.id;
+      state.empresaNome = empresa.nome;
+      window.fenixDefinirEmpresa(empresa.id);
+      closeModal('modalEmpresa');
+      showToast('Você entrou na empresa "' + empresa.nome + '".');
+      render();
+    }).catch(function(err){ showToast(err.message || 'Código de empresa não encontrado.'); });
+  }
+}
+
 function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
 
 /* ===================== APP STATE ===================== */
@@ -990,16 +1163,25 @@ var state = {
   online: navigator.onLine,
   usuarioLogado: null,
   modoLogin: 'entrar', // 'entrar' | 'criar'
-  orcamentoAtual: null
+  orcamentoAtual: null,
+  empresaId: null,
+  empresaNome: '',
+  modoEmpresa: 'criar', // 'criar' | 'entrar'
+  relFiltroClienteId: '',
+  relFiltroStatus: '',
+  relDataDe: '',
+  relDataAte: '',
+  materiaisCache: {}
 };
 
-/* ===================== NAV: TOPO (Dashboard / Soluções / Kits / Tipos / Clientes / Chamados) ===================== */
+/* ===================== NAV: TOPO (Dashboard / Soluções / Kits / Tipos / Clientes / Chamados / Relatórios) ===================== */
 function irParaDashboard(){ state.view='dashboard'; render(); updateNavActive('dashboard'); }
 function irParaSolucoes(){ state.view='lista'; state.solucaoAtualId=null; state.searchTerm=''; render(); updateNavActive('solucoes'); }
 function irParaKits(){ state.view='kits'; render(); updateNavActive('kits'); }
 function irParaTipos(){ state.view='tipos'; render(); updateNavActive('tipos'); }
 function irParaClientes(){ state.view='clientes'; state.clienteAtualId=null; render(); updateNavActive('clientes'); }
 function irParaChamados(){ state.view='chamados'; render(); updateNavActive('chamados'); }
+function irParaRelatorios(){ state.view='relatorios'; render(); updateNavActive('relatorios'); }
 function updateNavActive(section){
   document.querySelectorAll('[data-section]').forEach(function(el){
     if(el.getAttribute('data-section') === section) el.classList.add('active');
@@ -1020,6 +1202,8 @@ function render(){
     app.innerHTML = renderClienteDetalhe(state.clienteAtualId);
   } else if(state.view === 'chamados'){
     app.innerHTML = renderListaChamados();
+  } else if(state.view === 'relatorios'){
+    app.innerHTML = renderRelatorioChamados();
   } else if(state.view === 'kits'){
     app.innerHTML = renderListaKits();
   } else if(state.view === 'tipos'){
@@ -1054,6 +1238,14 @@ function renderDashboard(){
   html += '    <button class="btn btn-ghost" onclick="openNovoChamado(null)">+ Novo Chamado</button>';
   html += '    <button class="btn btn-primary" onclick="openNovaSolucao()">+ Nova Solução</button>';
   html += '  </div>';
+  html += '</div>';
+
+  if(state.empresaId){
+    html += '<div class="hint" style="margin:-8px 0 16px;background:#F3F4F9;padding:10px 14px;border-radius:10px;">Empresa: <b>'+escapeHtml(state.empresaNome||'')+'</b> · Código pra convidar sua equipe: <b>'+escapeHtml(state.empresaId)+'</b></div>';
+  }
+  html += '<div class="toolbar-row" style="margin-top:-8px;">';
+  html += '  <button class="btn btn-ghost btn-sm" onclick="exportarBackup()">⬇ Exportar backup</button>';
+  html += '  <button class="btn btn-ghost btn-sm" onclick="triggerImportarBackup()">⬆ Importar backup</button>';
   html += '</div>';
 
   html += '<div class="stat-grid">';
@@ -1200,6 +1392,7 @@ function renderListaTipos(){
   return html;
 }
 
+function emailUsuarioAtual(){ return state.usuarioLogado || null; }
 function nomeExibicaoCliente(c){
   if(c.tipoPessoa === 'PJ') return c.nomeFantasia || c.razaoSocial || 'Cliente PJ';
   return c.nome || 'Cliente';
@@ -1288,6 +1481,7 @@ function renderClienteDetalhe(clienteId){
   var localidade = [cliente.bairro, cliente.cidade, cliente.uf].filter(Boolean).join(' - ');
   if(endereco || localidade) html += '<span><b>Endereço:</b> '+escapeHtml([endereco, localidade].filter(Boolean).join(' — '))+'</span>';
   if(cliente.referencia) html += '<span><b>Referência:</b> '+escapeHtml(cliente.referencia)+'</span>';
+  if(cliente.criadoPor) html += '<span><b>Cadastrado por:</b> '+escapeHtml(cliente.criadoPor)+'</span>';
   html += '  </div>';
   html += '</div>';
 
@@ -1335,6 +1529,10 @@ function renderClienteDetalhe(clienteId){
 }
 
 var LABEL_STATUS_CHAMADO = { aberto:'Aberto', em_andamento:'Em andamento', concluido:'Concluído', cancelado:'Cancelado' };
+function nomeAtivoParaChamado(ativoId){
+  var a = loadAtivos().find(function(x){ return x.id===ativoId; });
+  return a ? (a.identificacao || a.tipo || 'Ativo') : '';
+}
 var LABEL_PRIORIDADE = { baixa:'Baixa', normal:'Normal', alta:'Alta', urgente:'Urgente' };
 
 function renderListaChamados(){
@@ -1376,7 +1574,7 @@ function renderListaChamados(){
       var cliente = clientePorId[ch.clienteId];
       html += '<div class="solucao-card" onclick="openEditarChamado(\''+ch.id+'\')">';
       html += '  <div class="top"><h3>'+escapeHtml(ch.titulo||'(sem assunto)')+'</h3><span class="status-chamado '+ch.status+'">'+LABEL_STATUS_CHAMADO[ch.status]+'</span></div>';
-      html += '  <p class="desc">'+(cliente?escapeHtml(nomeExibicaoCliente(cliente)):'Cliente removido')+'</p>';
+      html += '  <p class="desc">'+(cliente?escapeHtml(nomeExibicaoCliente(cliente)):'Cliente removido')+(ch.ativoId?' · '+escapeHtml(nomeAtivoParaChamado(ch.ativoId)):'')+'</p>';
       html += '  <span class="prioridade-chip '+ch.prioridade+'">Prioridade: '+LABEL_PRIORIDADE[ch.prioridade]+'</span>';
       html += '  <div class="actions" onclick="event.stopPropagation()">';
       html += '    <select class="chamado-select-status" onchange="mudarStatusChamadoRapido(\''+ch.id+'\', this.value)">';
@@ -1394,6 +1592,134 @@ function renderListaChamados(){
   return html;
 }
 function filtrarChamados(f){ state.filtroChamados = f; render(); }
+
+/* ===================== RELATÓRIOS ===================== */
+function chamadosFiltradosRelatorio(){
+  var chamados = loadChamados();
+  return chamados.filter(function(ch){
+    if(state.relFiltroClienteId && ch.clienteId !== state.relFiltroClienteId) return false;
+    if(state.relFiltroStatus && ch.status !== state.relFiltroStatus) return false;
+    if(state.relDataDe && new Date(ch.criadoEm) < new Date(state.relDataDe+'T00:00:00')) return false;
+    if(state.relDataAte && new Date(ch.criadoEm) > new Date(state.relDataAte+'T23:59:59')) return false;
+    return true;
+  }).sort(function(a,b){ return new Date(b.criadoEm) - new Date(a.criadoEm); });
+}
+function aplicarFiltroRelatorio(campo, valor){
+  state[campo] = valor;
+  render();
+}
+function limparFiltroRelatorio(){
+  state.relFiltroClienteId = ''; state.relFiltroStatus = ''; state.relDataDe = ''; state.relDataAte = '';
+  render();
+}
+function renderRelatorioChamados(){
+  var clientes = loadClientes();
+  var clientePorId = {}; clientes.forEach(function(c){ clientePorId[c.id] = c; });
+  var chamados = chamadosFiltradosRelatorio();
+
+  var porStatus = { aberto:0, em_andamento:0, concluido:0, cancelado:0 };
+  chamados.forEach(function(ch){ if(porStatus[ch.status] !== undefined) porStatus[ch.status]++; });
+
+  var html = '';
+  html += '<div class="toolbar">';
+  html += '  <div><h1 class="page-title">Relatório — Histórico de Chamados</h1><p class="page-sub" style="margin:0;">Filtre por cliente, status e período.</p></div>';
+  html += '  <button class="btn btn-primary" onclick="exportarRelatorioChamadosPDF()">Exportar PDF</button>';
+  html += '</div>';
+
+  html += '<div class="stat-grid">';
+  html += statCard(chamados.length, 'Total no filtro', "''");
+  html += statCard(porStatus.aberto, 'Abertos', "''");
+  html += statCard(porStatus.em_andamento, 'Em andamento', "''");
+  html += statCard(porStatus.concluido, 'Concluídos', "''");
+  html += statCard(porStatus.cancelado, 'Cancelados', "''");
+  html += '</div>';
+
+  html += '<div class="form-grid" style="margin:18px 0 6px;">';
+  html += '  <div class="form-row"><label>Cliente</label><select onchange="aplicarFiltroRelatorio(\'relFiltroClienteId\', this.value)"><option value="">Todos</option>';
+  clientes.forEach(function(c){ html += '<option value="'+c.id+'" '+(state.relFiltroClienteId===c.id?'selected':'')+'>'+escapeHtmlAttr(nomeExibicaoCliente(c))+'</option>'; });
+  html += '  </select></div>';
+  html += '  <div class="form-row"><label>Status</label><select onchange="aplicarFiltroRelatorio(\'relFiltroStatus\', this.value)">';
+  html += '<option value="">Todos</option>';
+  Object.keys(LABEL_STATUS_CHAMADO).forEach(function(s){ html += '<option value="'+s+'" '+(state.relFiltroStatus===s?'selected':'')+'>'+LABEL_STATUS_CHAMADO[s]+'</option>'; });
+  html += '  </select></div>';
+  html += '  <div class="form-row"><label>De</label><input type="date" value="'+state.relDataDe+'" onchange="aplicarFiltroRelatorio(\'relDataDe\', this.value)"></div>';
+  html += '  <div class="form-row"><label>Até</label><input type="date" value="'+state.relDataAte+'" onchange="aplicarFiltroRelatorio(\'relDataAte\', this.value)"></div>';
+  html += '</div>';
+  html += '<button class="btn btn-ghost btn-sm" style="margin-bottom:18px;" onclick="limparFiltroRelatorio()">Limpar filtros</button>';
+
+  if(chamados.length === 0){
+    html += '<div class="empty-state"><div class="glyph">📋</div><h3>Nada encontrado</h3><p>Ajuste os filtros acima.</p></div>';
+  } else {
+    html += '<div class="tree">';
+    chamados.forEach(function(ch){
+      var cliente = clientePorId[ch.clienteId];
+      html += '<div class="ativo-card">';
+      html += '  <div class="ativo-head"><div class="ativo-titlewrap">';
+      html += '    <span class="ativo-title">'+escapeHtml(ch.titulo||'(sem assunto)')+'</span>';
+      html += '    <span class="status-chamado '+ch.status+'">'+LABEL_STATUS_CHAMADO[ch.status]+'</span>';
+      html += '  </div></div>';
+      html += '  <div class="ativo-meta">';
+      html += '<span><b>Cliente:</b> '+(cliente?escapeHtml(nomeExibicaoCliente(cliente)):'—')+'</span>';
+      if(ch.ativoId) html += '<span><b>Ativo:</b> '+escapeHtml(nomeAtivoParaChamado(ch.ativoId))+'</span>';
+      html += '<span><b>Prioridade:</b> '+LABEL_PRIORIDADE[ch.prioridade]+'</span>';
+      html += '<span><b>Aberto em:</b> '+new Date(ch.criadoEm).toLocaleDateString('pt-BR')+'</span>';
+      if(ch.dataConclusao) html += '<span><b>Concluído em:</b> '+new Date(ch.dataConclusao).toLocaleDateString('pt-BR')+'</span>';
+      if(ch.criadoPor) html += '<span><b>Aberto por:</b> '+escapeHtml(ch.criadoPor)+'</span>';
+      html += '  </div>';
+      html += '</div>';
+    });
+    html += '</div>';
+  }
+  return html;
+}
+function exportarRelatorioChamadosPDF(){
+  if(typeof window.jspdf === 'undefined'){ showToast('Não foi possível carregar o gerador de PDF. Verifique sua conexão com a internet.'); return; }
+  var clientes = loadClientes();
+  var clientePorId = {}; clientes.forEach(function(c){ clientePorId[c.id] = c; });
+  var chamados = chamadosFiltradosRelatorio();
+
+  var jsPDFCtor = window.jspdf.jsPDF;
+  var doc = new jsPDFCtor({ unit:'mm', format:'a4' });
+  var pageW = doc.internal.pageSize.getWidth();
+  var pageH = doc.internal.pageSize.getHeight();
+  var marginL = 15, marginR = 15, y = 20;
+
+  function ensureSpace(){ if(y > pageH - 22){ doc.addPage(); y = 20; } }
+
+  doc.setFontSize(16);
+  doc.setTextColor(4,18,115);
+  doc.text('Relatório — Histórico de Chamados', marginL, y); y += 7;
+  doc.setFontSize(10);
+  doc.setTextColor(107,111,140);
+  doc.text('Fênix Soluções Tecnológicas — ' + new Date().toLocaleDateString('pt-BR') + ' — ' + chamados.length + ' chamado(s)', marginL, y); y += 8;
+  doc.setDrawColor(225,227,239);
+  doc.line(marginL, y, pageW - marginR, y); y += 8;
+
+  chamados.forEach(function(ch){
+    ensureSpace();
+    var cliente = clientePorId[ch.clienteId];
+    doc.setFontSize(11);
+    doc.setTextColor(2,7,51);
+    doc.text('• ' + (ch.titulo||'(sem assunto)') + ' — ' + LABEL_STATUS_CHAMADO[ch.status], marginL, y); y += 5.5;
+    doc.setFontSize(9.5);
+    doc.setTextColor(107,111,140);
+    var linha = 'Cliente: ' + (cliente?nomeExibicaoCliente(cliente):'—') + (ch.ativoId ? ('   |   Ativo: ' + nomeAtivoParaChamado(ch.ativoId)) : '') + '   |   Prioridade: ' + LABEL_PRIORIDADE[ch.prioridade] + '   |   Aberto: ' + new Date(ch.criadoEm).toLocaleDateString('pt-BR');
+    if(ch.dataConclusao) linha += '   |   Concluído: ' + new Date(ch.dataConclusao).toLocaleDateString('pt-BR');
+    var partes = doc.splitTextToSize(linha, pageW - marginR - marginL - 4);
+    partes.forEach(function(p){ ensureSpace(); doc.text(p, marginL+4, y); y += 5; });
+    y += 3;
+  });
+
+  var totalPaginas = doc.internal.getNumberOfPages();
+  for(var p=1;p<=totalPaginas;p++){
+    doc.setPage(p);
+    doc.setFontSize(8);
+    doc.setTextColor(150,150,170);
+    doc.text('Fênix Soluções Tecnológicas · Fênix Ativos', marginL, pageH - 10);
+    doc.text(String(p) + '/' + totalPaginas, pageW - marginR, pageH - 10, { align:'right' });
+  }
+  doc.save('Fenix_Relatorio_Chamados.pdf');
+}
 
 function renderDetalheSolucao(solucaoId){
   var solucoes = loadSolucoes();
@@ -1461,7 +1787,7 @@ function renderDetalheSolucao(solucaoId){
       html += '</div>';
     } else {
       html += '<div class="tree">';
-      raizesVisiveis.forEach(function(a){ html += renderAtivoNode(a, todosAtivos, visibleIds, termo); });
+      raizesVisiveis.forEach(function(a){ html += renderAtivoNode(a, todosAtivos, visibleIds, termo, solucao.clienteId||null); });
       html += '</div>';
     }
   }
@@ -1471,7 +1797,7 @@ function renderDetalheSolucao(solucaoId){
 /* ===================== RENDER: ATIVO NODE (recursivo) ===================== */
 function byOrdem(a,b){ return (a.ordem||0) - (b.ordem||0); }
 
-function renderAtivoNode(ativo, todosAtivos, visibleIds, termo){
+function renderAtivoNode(ativo, todosAtivos, visibleIds, termo, clienteId){
   var filhosTodos = todosAtivos.filter(function(a){ return a.paiId === ativo.id; }).sort(byOrdem);
   var filhos = visibleIds ? filhosTodos.filter(function(a){ return visibleIds[a.id]; }) : filhosTodos;
   var buscando = !!termo;
@@ -1517,6 +1843,9 @@ function renderAtivoNode(ativo, todosAtivos, visibleIds, termo){
   if(ativo.tipo){
     html += '      <button class="btn btn-ghost btn-sm" onclick="openAplicarKit(\''+ativo.id+'\')" title="Aplicar um kit de itens (parafusos, cabos etc.) cadastrado para o tipo \''+escapeHtmlAttr(ativo.tipo)+'\'">+ Kit</button>';
   }
+  if(clienteId){
+    html += '      <button class="btn btn-ghost btn-sm" onclick="abrirChamadoDoAtivo(\''+ativo.id+'\')" title="Abrir chamado referente a este ativo específico">+ Chamado</button>';
+  }
   if(ativo.quantidade && ativo.quantidade > 1 && filhosTodos.length === 0){
     html += '      <button class="btn btn-secondary btn-sm" onclick="desmembrarAtivo(\''+ativo.id+'\')" title="Transformar esta quantidade em '+ativo.quantidade+' sub-ativos individuais, cada um com seu próprio nº de série">Desmembrar em '+ativo.quantidade+'</button>';
   }
@@ -1526,7 +1855,7 @@ function renderAtivoNode(ativo, todosAtivos, visibleIds, termo){
 
   if(filhos.length > 0 && !isCollapsed){
     html += '  <div class="children">';
-    filhos.forEach(function(f){ html += renderAtivoNode(f, todosAtivos, visibleIds, termo); });
+    filhos.forEach(function(f){ html += renderAtivoNode(f, todosAtivos, visibleIds, termo, clienteId); });
     html += '  </div>';
   }
   html += '</div>';
@@ -1841,9 +2170,10 @@ function salvarCliente(){
   if(state.editingClienteId){
     var c = clientes.find(function(x){ return x.id===state.editingClienteId; });
     Object.assign(c, payload);
+    c.atualizadoPor = emailUsuarioAtual();
     registro = c;
   } else {
-    registro = Object.assign({ id: uid(), arquivado:false, criadoEm: new Date().toISOString() }, payload);
+    registro = Object.assign({ id: uid(), arquivado:false, criadoEm: new Date().toISOString(), criadoPor: emailUsuarioAtual(), atualizadoPor: emailUsuarioAtual() }, payload);
     clientes.push(registro);
   }
   saveClientes(clientes);
@@ -1898,9 +2228,48 @@ function preencherSelectSolucoesChamado(clienteId, selecionadoId){
   }).join('');
   sel.innerHTML = html;
 }
+function preencherSelectAtivosChamado(solucaoId, selecionadoId){
+  var sel = document.getElementById('mhAtivo');
+  if(!solucaoId){ sel.innerHTML = '<option value="">— Chamado geral da solução —</option>'; return; }
+  var todosAtivos = loadAtivos().filter(function(a){ return a.solucaoId===solucaoId; });
+  var raizes = todosAtivos.filter(function(a){ return !a.paiId; }).sort(byOrdem);
+  var opcoes = [];
+  function coletar(ativo, prof){
+    opcoes.push({ id: ativo.id, label: '— '.repeat(prof) + (ativo.identificacao || ativo.tipo || 'Item') });
+    todosAtivos.filter(function(a){ return a.paiId===ativo.id; }).sort(byOrdem).forEach(function(f){ coletar(f, prof+1); });
+  }
+  raizes.forEach(function(r){ coletar(r, 0); });
+  var html = '<option value="">— Chamado geral da solução —</option>';
+  html += opcoes.map(function(o){ return '<option value="'+o.id+'" '+(o.id===selecionadoId?'selected':'')+'>'+escapeHtmlAttr(o.label)+'</option>'; }).join('');
+  sel.innerHTML = html;
+}
 function onChangeClienteChamado(){
   var clienteId = document.getElementById('mhCliente').value;
   preencherSelectSolucoesChamado(clienteId, null);
+  preencherSelectAtivosChamado(null, null);
+}
+function onChangeSolucaoChamado(){
+  var solucaoId = document.getElementById('mhSolucao').value || null;
+  preencherSelectAtivosChamado(solucaoId, null);
+}
+function abrirChamadoDoAtivo(ativoId){
+  var ativo = loadAtivos().find(function(a){ return a.id===ativoId; });
+  if(!ativo) return;
+  var solucao = loadSolucoes().find(function(s){ return s.id===ativo.solucaoId; });
+  if(!solucao || !solucao.clienteId){ showToast('Este ativo não pertence a uma Solução de cliente.'); return; }
+  var clientes = loadClientes().filter(function(c){ return !c.arquivado; });
+  if(clientes.length === 0){ showToast('Cadastre um cliente antes de abrir um chamado.'); return; }
+  state.editingChamadoId = null;
+  document.getElementById('mhTitle').textContent = 'Novo Chamado';
+  preencherSelectClientesChamado(solucao.clienteId);
+  preencherSelectSolucoesChamado(solucao.clienteId, solucao.id);
+  preencherSelectAtivosChamado(solucao.id, ativo.id);
+  document.getElementById('mhTitulo').value = '';
+  document.getElementById('mhDescricao').value = '';
+  document.getElementById('mhPrioridade').value = 'normal';
+  document.getElementById('mhStatus').value = 'aberto';
+  document.getElementById('mhRelatorio').value = '';
+  openModal('modalChamado');
 }
 function openNovoChamado(clienteIdPrefill){
   var clientes = loadClientes().filter(function(c){ return !c.arquivado; });
@@ -1909,6 +2278,7 @@ function openNovoChamado(clienteIdPrefill){
   document.getElementById('mhTitle').textContent = 'Novo Chamado';
   preencherSelectClientesChamado(clienteIdPrefill);
   preencherSelectSolucoesChamado(clienteIdPrefill || document.getElementById('mhCliente').value, null);
+  preencherSelectAtivosChamado(null, null);
   document.getElementById('mhTitulo').value = '';
   document.getElementById('mhDescricao').value = '';
   document.getElementById('mhPrioridade').value = 'normal';
@@ -1923,6 +2293,7 @@ function openEditarChamado(id){
   document.getElementById('mhTitle').textContent = 'Editar Chamado';
   preencherSelectClientesChamado(ch.clienteId);
   preencherSelectSolucoesChamado(ch.clienteId, ch.solucaoId);
+  preencherSelectAtivosChamado(ch.solucaoId, ch.ativoId);
   document.getElementById('mhTitulo').value = ch.titulo || '';
   document.getElementById('mhDescricao').value = ch.descricaoProblema || '';
   document.getElementById('mhPrioridade').value = ch.prioridade || 'normal';
@@ -1940,6 +2311,7 @@ function salvarChamado(){
   var payload = {
     clienteId: clienteId,
     solucaoId: document.getElementById('mhSolucao').value || null,
+    ativoId: document.getElementById('mhAtivo').value || null,
     titulo: titulo,
     descricaoProblema: document.getElementById('mhDescricao').value.trim(),
     prioridade: document.getElementById('mhPrioridade').value,
@@ -1952,13 +2324,16 @@ function salvarChamado(){
     var ch = chamados.find(function(x){ return x.id===state.editingChamadoId; });
     var eraConcluido = ch.status === 'concluido';
     Object.assign(ch, payload);
+    ch.atualizadoPor = emailUsuarioAtual();
     if(status==='concluido' && !eraConcluido) ch.dataConclusao = new Date().toISOString();
     if(status!=='concluido') ch.dataConclusao = null;
   } else {
     chamados.push(Object.assign({
       id: uid(),
       dataConclusao: status==='concluido' ? new Date().toISOString() : null,
-      criadoEm: new Date().toISOString()
+      criadoEm: new Date().toISOString(),
+      criadoPor: emailUsuarioAtual(),
+      atualizadoPor: emailUsuarioAtual()
     }, payload));
   }
   saveChamados(chamados);
@@ -1972,6 +2347,7 @@ function mudarStatusChamadoRapido(id, novoStatus){
   if(!ch) return;
   var eraConcluido = ch.status === 'concluido';
   ch.status = novoStatus;
+  ch.atualizadoPor = emailUsuarioAtual();
   if(novoStatus==='concluido' && !eraConcluido) ch.dataConclusao = new Date().toISOString();
   if(novoStatus!=='concluido') ch.dataConclusao = null;
   saveChamados(chamados);
@@ -2061,16 +2437,18 @@ function openEditarKit(id){
   refreshDatalists();
   var itens = loadItensKit().filter(function(i){ return i.kitId===id; }).sort(byOrdem);
   if(itens.length === 0){ addKitItemRow(); }
-  else { itens.forEach(function(it){ addKitItemRow(it.nome, it.quantidadePadrao, it.variavel); }); }
+  else { itens.forEach(function(it){ addKitItemRow(it.nome, it.quantidadePadrao, it.variavel, it.tipoItem, it.obrigatorio); }); }
   openModal('modalKit');
 }
-function addKitItemRow(nome, qtd, variavel){
+function addKitItemRow(nome, qtd, variavel, tipoItem, obrigatorio){
   var wrap = document.getElementById('mkItensWrap');
   var row = document.createElement('div');
   row.className = 'kititem-editrow';
   row.innerHTML =
-    '<input type="text" class="kiNome" placeholder="Nome do item (ex.: Parafuso 6x50mm com bucha)" value="'+(nome?escapeHtmlAttr(nome):'')+'">'+
+    '<input type="text" class="kiNome" placeholder="Nome do item (ex.: Detector de Fumaça)" value="'+(nome?escapeHtmlAttr(nome):'')+'">'+
+    '<input type="text" class="kiTipo" list="dlTipos" placeholder="Subcategoria (ex.: Detectores)" value="'+(tipoItem?escapeHtmlAttr(tipoItem):'')+'">'+
     '<input type="number" class="kiQtd" min="0" value="'+(qtd!==undefined && qtd!==null ? qtd : 1)+'" placeholder="Qtd">'+
+    '<label class="kiVarLabel"><input type="checkbox" class="kiObrig" '+(obrigatorio?'checked':'')+'> Obrigatório</label>'+
     '<label class="kiVarLabel"><input type="checkbox" class="kiVar" '+(variavel?'checked':'')+'> Variável</label>'+
     '<button type="button" class="remove-x" onclick="this.parentNode.remove()">&times;</button>';
   wrap.appendChild(row);
@@ -2085,9 +2463,14 @@ function salvarKit(){
   var itensPayload = [];
   document.querySelectorAll('#mkItensWrap .kititem-editrow').forEach(function(row){
     var n = row.querySelector('.kiNome').value.trim();
+    var t = row.querySelector('.kiTipo').value.trim();
     var q = parseInt(row.querySelector('.kiQtd').value,10);
     var v = row.querySelector('.kiVar').checked;
-    if(n) itensPayload.push({ nome:n, quantidadePadrao: isNaN(q)?1:q, variavel: v });
+    var o = row.querySelector('.kiObrig').checked;
+    if(n){
+      if(t) registrarTipoSeNovo(t);
+      itensPayload.push({ nome:n, tipoItem:t, quantidadePadrao: isNaN(q)?1:q, variavel: v, obrigatorio: o });
+    }
   });
   if(itensPayload.length === 0){ showToast('Adicione ao menos um item ao kit.'); return; }
 
@@ -2104,7 +2487,7 @@ function salvarKit(){
     kits.push({ id:kitId, nome:nome, tipoAssociado:tipo, criadoEm:new Date().toISOString() });
   }
   itensPayload.forEach(function(p, idx){
-    todosItensKit.push({ id: uid(), kitId: kitId, nome:p.nome, quantidadePadrao:p.quantidadePadrao, variavel:p.variavel, ordem: idx });
+    todosItensKit.push({ id: uid(), kitId: kitId, nome:p.nome, tipoItem:p.tipoItem, quantidadePadrao:p.quantidadePadrao, variavel:p.variavel, obrigatorio:p.obrigatorio, ordem: idx });
   });
   saveKits(kits);
   saveItensKit(todosItensKit);
@@ -2120,7 +2503,7 @@ function duplicarKit(id){
   var todosItensKit = loadItensKit();
   var itensOriginais = todosItensKit.filter(function(i){ return i.kitId===id; });
   var novosItens = itensOriginais.map(function(i){
-    return { id: uid(), kitId: novoKit.id, nome:i.nome, quantidadePadrao:i.quantidadePadrao, variavel:i.variavel, ordem:i.ordem };
+    return { id: uid(), kitId: novoKit.id, nome:i.nome, tipoItem:i.tipoItem, quantidadePadrao:i.quantidadePadrao, variavel:i.variavel, obrigatorio:i.obrigatorio, ordem:i.ordem };
   });
   saveKits(kits.concat([novoKit]));
   saveItensKit(todosItensKit.concat(novosItens));
@@ -2230,7 +2613,10 @@ function renderKitChecklist(kitId){
   var html = '';
   itens.forEach(function(it){
     html += '<div class="kititem-row">';
-    html += '  <label class="kititem-check"><input type="checkbox" class="akChk" data-id="'+it.id+'" data-nome="'+escapeHtmlAttr(it.nome)+'" checked> '+escapeHtml(it.nome)+(it.variavel?' <span class="tag-variavel">variável</span>':'')+'</label>';
+    html += '  <label class="kititem-check"><input type="checkbox" class="akChk" data-id="'+it.id+'" data-nome="'+escapeHtmlAttr(it.nome)+'" data-tipo="'+escapeHtmlAttr(it.tipoItem||it.nome)+'" checked> '+escapeHtml(it.nome)
+      +(it.tipoItem?' <span class="kit-tipo-badge" style="margin-left:4px;">'+escapeHtml(it.tipoItem)+'</span>':'')
+      +(it.obrigatorio?' <span class="tag-variavel" style="background:#DFF3E4;color:#1E7A38;">obrigatório</span>':' <span class="tag-variavel">opcional</span>')
+      +(it.variavel?' <span class="tag-variavel">variável</span>':'')+'</label>';
     html += '  <input type="number" class="akQtd" data-id="'+it.id+'" min="0" value="'+(it.quantidadePadrao||1)+'">';
     html += '</div>';
   });
@@ -2254,6 +2640,7 @@ function confirmarAplicarKit(){
     var qtd = parseInt(qtdInput.value,10);
     if(isNaN(qtd) || qtd <= 0) return;
     var nomeItem = chk.getAttribute('data-nome') || 'Item';
+    var tipoItem = chk.getAttribute('data-tipo') || nomeItem;
     ativos.push({
       id: uid(),
       solucaoId: ativoOriginal.solucaoId,
@@ -2261,7 +2648,7 @@ function confirmarAplicarKit(){
       ordem: ordemBase + criados,
       quantidade: qtd,
       identificacao: nomeItem,
-      tipo: nomeItem,
+      tipo: tipoItem,
       localizacao: '',
       marca: '',
       modelo: '',
@@ -2301,6 +2688,31 @@ function refreshDatalists(){
   fillDatalist('dlMarcas', uniqueVals('marca'));
   fillDatalist('dlModelos', uniqueVals('modelo'));
   fillDatalist('dlLocalizacoes', uniqueVals('localizacao'));
+  fillDatalist('dlCodigosFabricante', Object.keys(state.materiaisCache||{}));
+  atualizarCacheMateriais();
+}
+function atualizarCacheMateriais(){
+  if(!state.online || !window.fenixMateriais) return;
+  window.fenixMateriais.listar().then(function(itens){
+    var cache = {};
+    (itens||[]).forEach(function(m){ if(m.codigoFabricante) cache[m.codigoFabricante] = m; });
+    state.materiaisCache = cache;
+    var dl = document.getElementById('dlCodigosFabricante');
+    if(dl) dl.innerHTML = Object.keys(cache).map(function(v){ return '<option value="'+escapeHtmlAttr(v)+'">'; }).join('');
+  }).catch(function(err){ console.warn('Fênix Core: falha ao listar materiais:', err); });
+}
+function preencherDoMaterial(codigo){
+  codigo = (codigo||'').trim();
+  if(!codigo || !state.materiaisCache || !state.materiaisCache[codigo]) return;
+  var material = state.materiaisCache[codigo];
+  var campoTipo = document.getElementById('maTipo');
+  var campoMarca = document.getElementById('maMarca');
+  var campoModelo = document.getElementById('maModelo');
+  var preencheu = false;
+  if(campoTipo && !campoTipo.value && material.tipo){ campoTipo.value = material.tipo; preencheu = true; }
+  if(campoMarca && !campoMarca.value && material.marca){ campoMarca.value = material.marca; preencheu = true; }
+  if(campoModelo && !campoModelo.value && material.modelo){ campoModelo.value = material.modelo; preencheu = true; }
+  if(preencheu) showToast('Marca/Modelo preenchidos a partir do catálogo compartilhado.');
 }
 function registrarTipoSeNovo(nome){
   nome = (nome||'').trim();
@@ -2772,6 +3184,83 @@ function exportarOrcamentoPDF(){
 
   var nomeArquivo = 'Orcamento_' + orc.nomeSolucao.replace(/[^a-zA-Z0-9]+/g,'_') + '.pdf';
   doc.save(nomeArquivo);
+}
+
+/* ===================== BACKUP LOCAL (.json) ===================== */
+function exportarBackup(){
+  var dados = {
+    fenixAtivosBackup: true,
+    exportadoEm: new Date().toISOString(),
+    solucoes: loadSolucoes(),
+    ativos: loadAtivos(),
+    kits: loadKits(),
+    itensKit: loadItensKit(),
+    tipos: loadTipos(),
+    clientes: loadClientes(),
+    chamados: loadChamados()
+  };
+  var blob = new Blob([JSON.stringify(dados, null, 2)], { type:'application/json' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'Fenix_Ativos_Backup_' + new Date().toISOString().slice(0,10) + '.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 2000);
+  showToast('Backup exportado.');
+}
+function triggerImportarBackup(){
+  document.getElementById('inputBackupFile').click();
+}
+var backupPendente = null;
+function onArquivoBackupSelecionado(e){
+  var file = e.target.files[0];
+  if(!file) return;
+  var reader = new FileReader();
+  reader.onload = function(ev){
+    try{
+      var dados = JSON.parse(ev.target.result);
+      if(!dados || typeof dados !== 'object') throw new Error('formato inválido');
+      backupPendente = dados;
+      var resumo = 'Este arquivo contém: ' +
+        (dados.solucoes||[]).length + ' solução(ões), ' +
+        (dados.ativos||[]).length + ' ativo(s), ' +
+        (dados.kits||[]).length + ' kit(s), ' +
+        (dados.tipos||[]).length + ' tipo(s), ' +
+        (dados.clientes||[]).length + ' cliente(s), ' +
+        (dados.chamados||[]).length + ' chamado(s). Isso vai SUBSTITUIR todos os dados atuais deste dispositivo, de forma definitiva.';
+      document.getElementById('ibResumo').textContent = resumo;
+      document.getElementById('ibConfirmInput').value = '';
+      document.getElementById('ibConfirmBtn').disabled = true;
+      openModal('modalImportarBackup');
+    }catch(err){
+      showToast('Arquivo inválido. Selecione um backup exportado pelo Fênix Ativos.');
+    }
+    e.target.value = '';
+  };
+  reader.readAsText(file);
+}
+function checkImportarBackupWord(){
+  var val = document.getElementById('ibConfirmInput').value.trim().toUpperCase();
+  document.getElementById('ibConfirmBtn').disabled = (val !== 'SUBSTITUIR');
+}
+function confirmarImportarBackup(){
+  if(!backupPendente) return;
+  if(backupPendente.solucoes) localStorage.setItem(LS_SOLUCOES, JSON.stringify(backupPendente.solucoes));
+  if(backupPendente.ativos) localStorage.setItem(LS_ITENS, JSON.stringify(backupPendente.ativos));
+  if(backupPendente.kits) localStorage.setItem(LS_KITS, JSON.stringify(backupPendente.kits));
+  if(backupPendente.itensKit) localStorage.setItem(LS_ITENS_KIT, JSON.stringify(backupPendente.itensKit));
+  if(backupPendente.tipos) localStorage.setItem(LS_TIPOS, JSON.stringify(backupPendente.tipos));
+  if(backupPendente.clientes) localStorage.setItem(LS_CLIENTES, JSON.stringify(backupPendente.clientes));
+  if(backupPendente.chamados) localStorage.setItem(LS_CHAMADOS, JSON.stringify(backupPendente.chamados));
+  backupPendente = null;
+  closeModal('modalImportarBackup');
+  showToast('Backup importado com sucesso.');
+  if(state.online) sincronizarTudoParaNuvem();
+  state.view = 'dashboard';
+  updateNavActive('dashboard');
+  render();
 }
 
 /* ===================== UTIL ===================== */
