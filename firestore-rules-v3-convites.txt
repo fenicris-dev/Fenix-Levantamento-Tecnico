@@ -1,0 +1,66 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function autenticado() {
+      return request.auth != null;
+    }
+    function vinculoDoUsuario() {
+      return get(/databases/$(database)/documents/usuarios_empresa/$(request.auth.uid)).data;
+    }
+    function pertenceAEmpresa(empresaId) {
+      return autenticado()
+        && exists(/databases/$(database)/documents/usuarios_empresa/$(request.auth.uid))
+        && vinculoDoUsuario().empresaId == empresaId
+        && vinculoDoUsuario().status == 'aprovado';
+    }
+    function souDonoDaEmpresa(empresaId) {
+      return pertenceAEmpresa(empresaId) && vinculoDoUsuario().papel == 'dono';
+    }
+
+    // ---------- Empresas ----------
+    match /empresas/{empresaId} {
+      allow read: if autenticado();
+      allow create: if autenticado();
+      allow update, delete: if false;
+    }
+
+    // ---------- Vínculo usuário -> empresa ----------
+    // Cada um lê o próprio vínculo; o titular também pode listar/remover
+    // vínculos de quem já pertence à mesma empresa (gestão de equipe).
+    match /usuarios_empresa/{uid} {
+      allow get: if autenticado() && (request.auth.uid == uid || souDonoDaEmpresa(resource.data.empresaId));
+      allow list: if autenticado() && souDonoDaEmpresa(resource.data.empresaId);
+      allow create: if autenticado() && request.auth.uid == uid;
+      allow update: if autenticado() && request.auth.uid == uid;
+      allow delete: if autenticado() && (request.auth.uid == uid || souDonoDaEmpresa(resource.data.empresaId));
+    }
+
+    // ---------- Convites ----------
+    // Ler UM convite específico (pelo token) é liberado pra qualquer
+    // autenticado — o próprio token já é o segredo, é assim que a
+    // pessoa convidada consegue ver/aceitar antes de pertencer à
+    // empresa. Listar todos os convites, porém, é só pro titular
+    // (evita uma empresa enxergar convites de outra).
+    match /convites/{token} {
+      allow get: if autenticado();
+      allow list: if autenticado() && souDonoDaEmpresa(resource.data.empresaId);
+      allow create: if autenticado() && souDonoDaEmpresa(request.resource.data.empresaId);
+      allow update: if autenticado() && resource.data.usado == false;
+      allow delete: if autenticado() && souDonoDaEmpresa(resource.data.empresaId);
+    }
+
+    // ---------- Dados de cada empresa (isolados) ----------
+    match /empresas/{empresaId}/{tipoColecao}/{docId} {
+      allow read, write: if pertenceAEmpresa(empresaId);
+    }
+    match /empresas/{empresaId}/cidades/{codigoIBGE} {
+      allow read: if pertenceAEmpresa(empresaId);
+      allow write: if false;
+      match /bairros/{bairroId} {
+        allow read: if pertenceAEmpresa(empresaId);
+        allow write: if pertenceAEmpresa(empresaId);
+      }
+    }
+  }
+}
