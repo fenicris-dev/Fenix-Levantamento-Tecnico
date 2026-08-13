@@ -369,7 +369,7 @@
     <div><strong>&lt;Cristiano Fênix/&gt;</strong></div>
     <div><a href="https://wa.me/5579999680880" target="_blank" rel="noopener">Fênix Soluções Tecnológicas</a></div>
     <div><a href="https://instagram.com/fenixsolucoestecnologicas" target="_blank" rel="noopener">@fenixsolucoestecnologicas</a></div>
-    <div class="versao">Fênix Ativos v3.5</div>
+    <div class="versao">Fênix Ativos v3.6</div>
   </div>
 </nav>
 
@@ -385,7 +385,7 @@
 
 <footer class="fenix-footer">
   <div><strong>&lt;Cristiano Fênix/&gt;</strong> · <a href="https://wa.me/5579999680880" target="_blank" rel="noopener">Fênix Soluções Tecnológicas</a> · <a href="https://instagram.com/fenixsolucoestecnologicas" target="_blank" rel="noopener">@fenixsolucoestecnologicas</a></div>
-  <div style="margin-top:4px;">Fênix Ativos v3.5</div>
+  <div style="margin-top:4px;">Fênix Ativos v3.6</div>
 </footer>
 
 <!-- MODAL: Solução -->
@@ -1010,9 +1010,9 @@ setInterval(function(){ if(state.online) tentarEsvaziarFilaSync(); verificarNoti
 
 /* ===================== NOTIFICAÇÕES (sino) ===================== */
 var LS_NOTIFICACOES = 'fenixAtivos_v1_notificacoes';
-(function carregarNotificacoesSalvas(){
+function carregarNotificacoesSalvas(){
   try{ state.notificacoes = JSON.parse(localStorage.getItem(LS_NOTIFICACOES)) || []; }catch(e){ state.notificacoes = []; }
-})();
+}
 function adicionarNotificacao(texto){
   var notif = { id: uid(), texto: texto, criadoEm: new Date().toISOString(), lida: false };
   state.notificacoes.unshift(notif);
@@ -3639,6 +3639,7 @@ render();
 updateNavActive('dashboard');
 updateOnlineStatus();
 detectarConviteNaURL();
+carregarNotificacoesSalvas();
 atualizarBadgeNotificacoes();
 if(state.tokenConvitePendente && !state.usuarioLogado){
   setTimeout(function(){
