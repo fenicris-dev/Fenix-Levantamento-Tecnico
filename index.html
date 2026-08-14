@@ -261,6 +261,14 @@
   select#akKitSelect{border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:14px;background:#fbfbfd;}
   .kit-tipo-badge{background:var(--blue);color:#fff;font-size:11.5px;font-weight:600;padding:2px 9px;border-radius:20px;}
 
+  .manual-toc{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px;}
+  .manual-toc-item{background:#fff;border:1px solid var(--border);border-radius:20px;padding:7px 14px;font-size:12.5px;color:var(--blue);text-decoration:none;font-weight:600;}
+  .manual-toc-item:hover{background:#F3F4F9;}
+  .manual-section{background:#fff;border:1px solid var(--border);border-radius:14px;padding:20px 22px;margin-bottom:16px;scroll-margin-top:16px;}
+  .manual-section h3{margin:0 0 10px;font-size:16px;color:var(--header);}
+  .manual-section p{margin:0 0 10px;font-size:13.5px;line-height:1.6;color:var(--text);}
+  .manual-section p:last-child{margin-bottom:0;}
+
   .orc-linha{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--border);font-size:14.5px;}
   .orc-linha span:first-child{color:var(--text);}
   .orc-linha span:last-child{font-weight:600;color:var(--text);}
@@ -330,6 +338,9 @@
   <span class="status-conexao" id="statusConexao">● --</span>
   <span class="status-usuario" id="statusUsuario" onclick="onClickStatusUsuario()">Entrar</span>
   <div class="topbar-icons">
+    <div class="icon-btn" title="Manual do usuário" onclick="irParaManual()">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 2-3 4"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    </div>
     <div class="icon-btn" id="btnNotif" title="Notificações" onclick="toggleNotificacoes()" style="position:relative;">
       <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
       <span id="badgeNotif" class="badge-notif" style="display:none;"></span>
@@ -369,7 +380,7 @@
     <div><strong>&lt;Cristiano Fênix/&gt;</strong></div>
     <div><a href="https://wa.me/5579999680880" target="_blank" rel="noopener">Fênix Soluções Tecnológicas</a></div>
     <div><a href="https://instagram.com/fenixsolucoestecnologicas" target="_blank" rel="noopener">@fenixsolucoestecnologicas</a></div>
-    <div class="versao">Fênix Ativos v3.6</div>
+    <div class="versao">Fênix Ativos v3.7</div>
   </div>
 </nav>
 
@@ -385,7 +396,7 @@
 
 <footer class="fenix-footer">
   <div><strong>&lt;Cristiano Fênix/&gt;</strong> · <a href="https://wa.me/5579999680880" target="_blank" rel="noopener">Fênix Soluções Tecnológicas</a> · <a href="https://instagram.com/fenixsolucoestecnologicas" target="_blank" rel="noopener">@fenixsolucoestecnologicas</a></div>
-  <div style="margin-top:4px;">Fênix Ativos v3.6</div>
+  <div style="margin-top:4px;">Fênix Ativos v3.7</div>
 </footer>
 
 <!-- MODAL: Solução -->
@@ -863,7 +874,7 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { FenixCore } from "https://fenicris-dev.github.io/Fenix-Levantamento-Tecnico/fenix-core-v1.6.js";
+  import { FenixCore } from "https://fenicris-dev.github.io/Fenix-Levantamento-Tecnico/fenix-core-v1.7.js";
 
   var firebaseConfig = {
     apiKey: "AIzaSyDU8pGPVrBOS75Fry9FB3H5nokw6Qk5wpA",
@@ -1177,6 +1188,14 @@ window.addEventListener('fenixAuthChanged', function(e){
     closeModal('modalLogin');
     if(!window.fenixEmpresas){ showToast('Conectado, mas o Fênix Core está indisponível no momento.'); return; }
     window.fenixEmpresas.obterEmpresaDoUsuario(e.detail.uid).then(function(vinculo){
+      if(vinculo && !vinculo.status){
+        return window.fenixEmpresas.repararVinculo(e.detail.uid, { status: 'aprovado' }).then(function(){
+          vinculo.status = 'aprovado';
+          return vinculo;
+        });
+      }
+      return vinculo;
+    }).then(function(vinculo){
       if(vinculo){
         state.empresaId = vinculo.empresaId;
         state.papelUsuario = vinculo.papel || 'tecnico';
@@ -1405,6 +1424,18 @@ function irParaClientes(){ state.view='clientes'; state.clienteAtualId=null; ren
 function irParaChamados(){ state.view='chamados'; render(); updateNavActive('chamados'); }
 function irParaRelatorios(){ state.view='relatorios'; render(); updateNavActive('relatorios'); }
 function irParaEquipe(){ state.view='equipe'; render(); updateNavActive('equipe'); }
+var telaAntesDoManual = 'dashboard';
+function irParaManual(){
+  if(state.view !== 'manual') telaAntesDoManual = state.view;
+  state.view = 'manual';
+  render();
+  updateNavActive('');
+}
+function sairDoManual(){
+  state.view = telaAntesDoManual;
+  render();
+  updateNavActive(telaAntesDoManual === 'lista' ? 'solucoes' : telaAntesDoManual);
+}
 function updateNavActive(section){
   document.querySelectorAll('[data-section]').forEach(function(el){
     if(el.getAttribute('data-section') === section) el.classList.add('active');
@@ -1429,6 +1460,8 @@ function render(){
     app.innerHTML = renderRelatorioChamados();
   } else if(state.view === 'equipe'){
     app.innerHTML = renderEquipe();
+  } else if(state.view === 'manual'){
+    app.innerHTML = renderManual();
   } else if(state.view === 'kits'){
     app.innerHTML = renderListaKits();
   } else if(state.view === 'tipos'){
@@ -1441,6 +1474,116 @@ function render(){
 function statCard(numero, label, onclickJs){
   return '<div class="stat-card" onclick="'+onclickJs+'"><div class="stat-num">'+numero+'</div><div class="stat-label">'+label+'</div></div>';
 }
+/* ===================== MANUAL DO USUÁRIO ===================== */
+var MANUAL_CONTEUDO = [
+  { id:'visao-geral', titulo:'Visão geral', paragrafos: [
+    'O Fênix Ativos organiza o trabalho em Soluções (a família do que você instala, ex.: CFTV, SDAI, Alarme), que contêm uma árvore de Ativos (os equipamentos, do maior pro menor). Kits e Tipos são catálogos de apoio: um Kit é a "receita" de itens que sempre acompanham um Tipo de ativo (ex.: parafusos e buchas de uma câmera). Clientes e Chamados existem pra quando um atendimento sai do papel de catálogo e vira trabalho de verdade.',
+    'O Dashboard é a tela inicial: mostra números gerais e atalhos rápidos pra criar qualquer coisa.'
+  ]},
+  { id:'solucoes', titulo:'Soluções', paragrafos: [
+    'Uma Solução é a família ampla de um tipo de serviço — CFTV, SDAI, Alarme de Intrusão, Controle de Acesso. Use sempre o nome da família, não da variante: "CFTV" e não "CFTV IP" — a variante vira um Ativo raiz dentro da Solução.',
+    'Soluções sem cliente vinculado formam o seu catálogo/modelo reutilizável. Quando você aplica uma Solução a um Cliente (pela tela do Cliente), ela é copiada inteira — a original do catálogo continua intacta.'
+  ]},
+  { id:'ativos', titulo:'Ativos', paragrafos: [
+    'Um Ativo é qualquer equipamento ou item dentro de uma Solução — o gravador, a câmera, o cabo, o parafuso. Todo Ativo pode ter Sub-ativos dentro dele, sem limite de profundidade.',
+    'Ao criar um Ativo, só Tipo e Quantidade são obrigatórios — o resto (Marca, Modelo, Série, Código do Fabricante, Localização, Preço) você preenche quando souber, inclusive depois de comprar o material.',
+    'Registrou uma quantidade maior que 1 (ex.: "Câmera x4") e depois comprou as unidades? Use Desmembrar pra transformar aquele registro em 4 sub-ativos individuais, cada um com seu próprio número de série.',
+    'Duplicar copia um Ativo (e tudo dentro dele). Número de Série e Código do Fabricante nunca são copiados numa duplicação, porque são identificadores únicos de cada unidade física.',
+    'A busca (dentro de uma Solução) encontra por nome, tipo, marca, modelo, série, código ou local, e expande a árvore até achar.'
+  ]},
+  { id:'kits', titulo:'Kits', paragrafos: [
+    'Um Kit é a lista de itens que sempre acompanham um Tipo de ativo. Cada item do Kit tem uma Subcategoria (o Tipo dele) e pode ser marcado como Obrigatório ou Opcional.',
+    'No Ativo, o botão "+ Kit" abre um checklist com os itens do kit associado ao Tipo daquele ativo — tudo vem marcado, você desmarca o que não se aplica àquele cliente, ajusta as quantidades, e confirma. Cada item marcado vira um sub-ativo.'
+  ]},
+  { id:'tipos', titulo:'Tipos', paragrafos: [
+    'O catálogo de Tipos (Câmera, NVR, Nobreak...) se alimenta sozinho conforme você digita um Tipo novo em qualquer Ativo ou Kit. Também dá pra criar, renomear (atualiza em cascata onde já foi usado) ou remover um Tipo manualmente nessa tela.'
+  ]},
+  { id:'clientes', titulo:'Clientes', paragrafos: [
+    'Cadastro de Pessoa Física ou Jurídica. Pra PJ, digite o CNPJ e use o botão Buscar — preenche Razão Social, Nome Fantasia e endereço sozinho. O CEP também tem busca automática de endereço.',
+    'Clientes podem ser arquivados (saem da lista principal, mas nada é apagado) e reaparecem na aba Arquivados.',
+    'Dentro da tela do Cliente, o botão "+ Solução" mostra o catálogo pra você marcar quais soluções esse cliente vai receber — cada uma marcada vira uma cópia própria dele.'
+  ]},
+  { id:'chamados', titulo:'Chamados', paragrafos: [
+    'Um Chamado é um atendimento — sempre vinculado a um Cliente, e opcionalmente a uma Solução (e até a um Ativo específico dela, se o problema for só naquele item). Tem Prioridade, Status e um campo de Relatório de Atendimento.',
+    'A troca de status pode ser feita direto na listagem, sem precisar abrir o chamado inteiro.'
+  ]},
+  { id:'orcamento', titulo:'Orçamento do Cliente', paragrafos: [
+    'Preencha o Preço de venda nos Ativos e o Valor de Instalação na Solução. O botão "Orçamento do Cliente" (na tela da Solução) soma tudo automaticamente por Ativo raiz, sem mostrar marca, modelo, série ou preço individual de cada peça — só o nome e o total. Dá pra exportar em PDF, pronto pra mandar pro cliente.'
+  ]},
+  { id:'relatorios', titulo:'Relatórios', paragrafos: [
+    'Histórico de Chamados, com filtro por Cliente, Status e período — e exportação em PDF.'
+  ]},
+  { id:'empresa-equipe', titulo:'Empresa e Equipe', paragrafos: [
+    'No primeiro acesso, você cria sua empresa ou aceita um convite de quem já tem uma. Todos os dados (Soluções, Ativos, Clientes, Chamados...) ficam isolados por empresa.',
+    'Só o titular (quem criou a empresa) vê a tela Equipe e pode convidar gente nova: gera um link de uso único, com QR Code e atalhos de WhatsApp/E-mail. A pessoa convidada clica, faz login ou cadastro, confirma, e já entra vinculada.'
+  ]},
+  { id:'offline', titulo:'Modo offline e sincronização', paragrafos: [
+    'O app funciona sem internet — tudo fica salvo no próprio aparelho. O selo no cabeçalho mostra "Online" ou "Offline", e conta quantos itens ainda estão esperando pra sincronizar. Volta a conexão, sincroniza sozinho.',
+    'Use "Exportar backup" (no Dashboard) de vez em quando pra guardar uma cópia de segurança em .json fora do app. "Importar backup" restaura — mas substitui tudo que está no aparelho, por isso pede confirmação digitada.'
+  ]},
+  { id:'notificacoes', titulo:'Notificações', paragrafos: [
+    'O sino no cabeçalho avisa quando: um item fica muito tempo sem sincronizar, alguém aceita seu convite e entra na equipe, ou um colega abre um chamado novo.'
+  ]}
+];
+function renderManual(){
+  var html = '';
+  html += '<div class="back-link" onclick="sairDoManual()">&larr; Voltar</div>';
+  html += '<div class="toolbar">';
+  html += '  <div><h1 class="page-title">Manual do Usuário</h1><p class="page-sub" style="margin:0;">Fênix Ativos — guia rápido de cada módulo.</p></div>';
+  html += '  <button class="btn btn-primary" onclick="exportarManualPDF()">Baixar PDF</button>';
+  html += '</div>';
+
+  html += '<div class="manual-toc">';
+  MANUAL_CONTEUDO.forEach(function(s){ html += '<a href="#manual-'+s.id+'" class="manual-toc-item">'+escapeHtml(s.titulo)+'</a>'; });
+  html += '</div>';
+
+  MANUAL_CONTEUDO.forEach(function(s){
+    html += '<div class="manual-section" id="manual-'+s.id+'">';
+    html += '<h3>'+escapeHtml(s.titulo)+'</h3>';
+    s.paragrafos.forEach(function(p){ html += '<p>'+escapeHtml(p)+'</p>'; });
+    html += '</div>';
+  });
+  return html;
+}
+function exportarManualPDF(){
+  if(typeof window.jspdf === 'undefined'){ showToast('Não foi possível carregar o gerador de PDF. Verifique sua conexão com a internet.'); return; }
+  var jsPDFCtor = window.jspdf.jsPDF;
+  var doc = new jsPDFCtor({ unit:'mm', format:'a4' });
+  var pageW = doc.internal.pageSize.getWidth();
+  var pageH = doc.internal.pageSize.getHeight();
+  var marginL = 18, marginR = 18, y = 22;
+  function ensureSpace(){ if(y > pageH - 20){ doc.addPage(); y = 20; } }
+
+  doc.setFontSize(18);
+  doc.setTextColor(4,18,115);
+  doc.text('Manual do Usuário — Fênix Ativos', marginL, y); y += 10;
+
+  MANUAL_CONTEUDO.forEach(function(s){
+    ensureSpace();
+    doc.setFontSize(13);
+    doc.setTextColor(4,18,115);
+    doc.text(s.titulo, marginL, y); y += 7;
+    doc.setFontSize(10.5);
+    doc.setTextColor(2,7,51);
+    s.paragrafos.forEach(function(p){
+      var linhas = doc.splitTextToSize(p, pageW - marginL - marginR);
+      linhas.forEach(function(l){ ensureSpace(); doc.text(l, marginL, y); y += 5.5; });
+      y += 2;
+    });
+    y += 4;
+  });
+
+  var totalPaginas = doc.internal.getNumberOfPages();
+  for(var p=1;p<=totalPaginas;p++){
+    doc.setPage(p);
+    doc.setFontSize(8);
+    doc.setTextColor(150,150,170);
+    doc.text('Fênix Soluções Tecnológicas · Fênix Ativos', marginL, pageH - 10);
+    doc.text(String(p) + '/' + totalPaginas, pageW - marginR, pageH - 10, { align:'right' });
+  }
+  doc.save('Fenix_Ativos_Manual_do_Usuario.pdf');
+}
+
 function renderDashboard(){
   var solucoesCatalogo = loadSolucoes().filter(function(s){ return !s.clienteId; });
   var ativos = loadAtivos();
