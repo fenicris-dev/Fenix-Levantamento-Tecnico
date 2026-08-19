@@ -362,41 +362,16 @@
 </header>
 
 <nav class="sidebar">
-  <div class="nav-item" data-section="dashboard" onclick="irParaDashboard()">
-    <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
-    Dashboard
+  <div id="navItemsContainer"></div>
+  <div class="nav-item" onclick="abrirPersonalizarMenu()" style="opacity:.75;font-size:12px;">
+    <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+    Personalizar menu
   </div>
-  <div class="nav-item" data-section="chamados" onclick="irParaChamados()">
-    <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3v5h5"/><path d="M6 3h8l6 6v11a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/></svg>
-    Chamados
-  </div>
-  <div class="nav-item" data-section="clientes" onclick="irParaClientes()">
-    <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
-    Clientes
-  </div>
-  <div class="nav-item" data-section="equipe" onclick="irParaEquipe()"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Equipe</div>
-  <div class="nav-item" data-section="areas" onclick="irParaAreas()">
-    <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-    Soluções
-  </div>
-  <div class="nav-item" data-section="solucoes" onclick="irParaSolucoes()">
-    <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
-    Segmentos
-  </div>
-  <div class="nav-item" data-section="tipos" onclick="irParaTipos()">
-    <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h6v6H4z"/><path d="M14 4h6v6h-6z"/><path d="M4 14h6v6H4z"/><path d="M14 14h6v6h-6z"/></svg>
-    Famílias
-  </div>
-  <div class="nav-item" data-section="kits" onclick="irParaKits()">
-    <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7L12 3 4 7v10l8 4 8-4V7z"/><path d="M4 7l8 4 8-4"/><path d="M12 11v10"/></svg>
-    Kits
-  </div>
-  <div class="nav-item" data-section="relatorios" onclick="irParaRelatorios()"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg>Relatórios</div>
   <div class="sidebar-footer">
     <div><strong>&lt;Cristiano Fênix/&gt;</strong></div>
     <div><a href="https://wa.me/5579999680880" target="_blank" rel="noopener">Fênix Soluções Tecnológicas</a></div>
     <div><a href="https://instagram.com/fenixsolucoestecnologicas" target="_blank" rel="noopener">@fenixsolucoestecnologicas</a></div>
-    <div class="versao">Fênix Ativos v4.0</div>
+    <div class="versao">Fênix Ativos v4.3</div>
   </div>
 </nav>
 
@@ -412,7 +387,7 @@
 
 <footer class="fenix-footer">
   <div><strong>&lt;Cristiano Fênix/&gt;</strong> · <a href="https://wa.me/5579999680880" target="_blank" rel="noopener">Fênix Soluções Tecnológicas</a> · <a href="https://instagram.com/fenixsolucoestecnologicas" target="_blank" rel="noopener">@fenixsolucoestecnologicas</a></div>
-  <div style="margin-top:4px;">Fênix Ativos v4.0</div>
+  <div style="margin-top:4px;">Fênix Ativos v4.3</div>
 </footer>
 
 <!-- MODAL: Solução (área de atuação) -->
@@ -535,6 +510,83 @@
 <datalist id="dlCodigosFabricante"></datalist>
 <datalist id="dlCidades"></datalist>
 <datalist id="dlBairros"></datalist>
+
+<!-- MODAL: Variante (tecnologia/subtipo dentro de um Segmento) -->
+<div class="overlay" id="modalVariante">
+  <div class="modal">
+    <h2 id="mvTitle">Nova Variante</h2>
+    <p class="hint">A tecnologia/subtipo dentro do Segmento. Ex.: dentro de CFTV, "CFTV IP", "CFTV HD", "CFTV Analógico". Os Produtos do catálogo entram depois, dentro dela.</p>
+    <div class="form-row">
+      <label>Nome da variante</label>
+      <input type="text" id="mvNome" placeholder="Ex.: CFTV IP" maxlength="60">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modalVariante')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarVariante()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Personalizar ordem do menu -->
+<div class="overlay" id="modalMenu">
+  <div class="modal">
+    <h2>Personalizar menu</h2>
+    <p class="hint">Use as setas pra mudar a ordem das seções no menu lateral. É só uma preferência sua, salva neste aparelho — não afeta outros usuários da empresa.</p>
+    <div id="menuOrdemLista" style="display:flex;flex-direction:column;gap:6px;max-height:340px;overflow:auto;"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="restaurarOrdemMenuPadrao()">Restaurar padrão</button>
+      <button class="btn btn-primary" onclick="closeModal('modalMenu')">Concluído</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Produtos de uma Variante -->
+<div class="overlay" id="modalProdutoVariante">
+  <div class="modal">
+    <h2 id="mavTitle">Produtos da variante</h2>
+    <p class="hint">Marque os produtos do catálogo que pertencem a esta variante.</p>
+    <div class="form-row">
+      <label>Buscar no catálogo</label>
+      <input type="text" id="mavBusca" placeholder="Buscar por código, tipo, marca ou modelo..." oninput="filtrarListaProdutoVariante()">
+    </div>
+    <div id="mavLista" style="max-height:260px;overflow:auto;display:flex;flex-direction:column;gap:6px;"></div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="closeModal('modalProdutoVariante')">Concluído</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Acessórios de um Produto -->
+<div class="overlay" id="modalAcessorios">
+  <div class="modal">
+    <h2 id="maccTitle">Acessórios</h2>
+    <p class="hint" id="maccSub"></p>
+    <div class="form-row">
+      <label>Buscar no catálogo</label>
+      <input type="text" id="maccBusca" placeholder="Buscar por código, tipo, marca ou modelo..." oninput="filtrarListaAcessorios()">
+    </div>
+    <div id="maccLista" style="max-height:260px;overflow:auto;display:flex;flex-direction:column;gap:6px;"></div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="closeModal('modalAcessorios')">Concluído</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Vincular Produto (catálogo mestre) a Segmentos -->
+<div class="overlay" id="modalAssociarProduto">
+  <div class="modal">
+    <h2 id="mpTitle">Vincular produto</h2>
+    <p class="hint" id="mpSub"></p>
+    <div class="form-row">
+      <label>Segmentos onde este produto é usado</label>
+      <div id="mpLista" style="max-height:260px;overflow:auto;display:flex;flex-direction:column;gap:6px;"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modalAssociarProduto')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarAssociacoesProduto()">Salvar</button>
+    </div>
+  </div>
+</div>
 
 <!-- MODAL: Tipo (criar/renomear) -->
 <div class="overlay" id="modalTipo">
@@ -1000,6 +1052,10 @@
 
 <script>
 /* ===================== DATA LAYER ===================== */
+var LS_VARIANTES = 'fenixAtivos_v1_variantes';
+var LS_ACESSORIOS = 'fenixAtivos_v1_acessorios';
+var LS_MENU_ORDEM = 'fenixAtivos_v1_menuOrdem'; // preferência local do aparelho, não sincroniza com a nuvem
+var LS_PRODUTOS = 'fenixAtivos_v1_produtos';
 var LS_AREAS = 'fenixAtivos_v1_areas';
 var LS_SOLUCOES = 'fenixAtivos_v1_solucoes';
 var LS_ITENS = 'fenixAtivos_v1_itens';
@@ -1009,6 +1065,12 @@ var LS_TIPOS = 'fenixAtivos_v1_tipos';
 var LS_CLIENTES = 'fenixAtivos_v1_clientes';
 var LS_CHAMADOS = 'fenixAtivos_v1_chamados';
 
+function loadVariantes(){ try{ return JSON.parse(localStorage.getItem(LS_VARIANTES)) || []; }catch(e){ return []; } }
+function saveVariantes(arr){ localStorage.setItem(LS_VARIANTES, JSON.stringify(arr)); cloudMirror('variantes', arr); }
+function loadAcessorios(){ try{ return JSON.parse(localStorage.getItem(LS_ACESSORIOS)) || []; }catch(e){ return []; } }
+function saveAcessorios(arr){ localStorage.setItem(LS_ACESSORIOS, JSON.stringify(arr)); cloudMirror('acessorios', arr); }
+function loadProdutos(){ try{ return JSON.parse(localStorage.getItem(LS_PRODUTOS)) || []; }catch(e){ return []; } }
+function saveProdutos(arr){ localStorage.setItem(LS_PRODUTOS, JSON.stringify(arr)); cloudMirror('produtos', arr); }
 function loadAreas(){ try{ return JSON.parse(localStorage.getItem(LS_AREAS)) || []; }catch(e){ return []; } }
 function saveAreas(arr){ localStorage.setItem(LS_AREAS, JSON.stringify(arr)); cloudMirror('areas', arr); }
 function loadSolucoes(){ try{ return JSON.parse(localStorage.getItem(LS_SOLUCOES)) || []; }catch(e){ return []; } }
@@ -1071,6 +1133,9 @@ function cloudMirror(chave, arr){
 }
 function sincronizarTudoParaNuvem(){
   if(!window.fenixCloud) return;
+  cloudMirror('variantes', loadVariantes());
+  cloudMirror('acessorios', loadAcessorios());
+  cloudMirror('produtos', loadProdutos());
   cloudMirror('areas', loadAreas());
   cloudMirror('solucoes', loadSolucoes());
   cloudMirror('ativos', loadAtivos());
@@ -1182,9 +1247,12 @@ function verificarNotificacoes(){
 window.addEventListener('fenixCloudReady', function(){
   tentarEsvaziarFilaSync();
   if(!navigator.onLine) return;
-  var vazio = loadAreas().length===0 && loadSolucoes().length===0 && loadAtivos().length===0 && loadKits().length===0 && loadItensKit().length===0 && loadTipos().length===0 && loadClientes().length===0 && loadChamados().length===0;
+  var vazio = loadVariantes().length===0 && loadAcessorios().length===0 && loadProdutos().length===0 && loadAreas().length===0 && loadSolucoes().length===0 && loadAtivos().length===0 && loadKits().length===0 && loadItensKit().length===0 && loadTipos().length===0 && loadClientes().length===0 && loadChamados().length===0;
   if(!vazio) return;
   Promise.all([
+    window.fenixCloud.carregar('variantes'),
+    window.fenixCloud.carregar('acessorios'),
+    window.fenixCloud.carregar('produtos'),
     window.fenixCloud.carregar('areas'),
     window.fenixCloud.carregar('solucoes'),
     window.fenixCloud.carregar('ativos'),
@@ -1195,14 +1263,17 @@ window.addEventListener('fenixCloudReady', function(){
     window.fenixCloud.carregar('chamados')
   ]).then(function(r){
     var achou = false;
-    if(r[0] && r[0].length){ localStorage.setItem(LS_AREAS, JSON.stringify(r[0])); achou = true; }
-    if(r[1] && r[1].length){ localStorage.setItem(LS_SOLUCOES, JSON.stringify(r[1])); achou = true; }
-    if(r[2] && r[2].length){ localStorage.setItem(LS_ITENS, JSON.stringify(r[2])); achou = true; }
-    if(r[3] && r[3].length){ localStorage.setItem(LS_KITS, JSON.stringify(r[3])); achou = true; }
-    if(r[4] && r[4].length){ localStorage.setItem(LS_ITENS_KIT, JSON.stringify(r[4])); achou = true; }
-    if(r[5] && r[5].length){ localStorage.setItem(LS_TIPOS, JSON.stringify(r[5])); achou = true; }
-    if(r[6] && r[6].length){ localStorage.setItem(LS_CLIENTES, JSON.stringify(r[6])); achou = true; }
-    if(r[7] && r[7].length){ localStorage.setItem(LS_CHAMADOS, JSON.stringify(r[7])); achou = true; }
+    if(r[0] && r[0].length){ localStorage.setItem(LS_VARIANTES, JSON.stringify(r[0])); achou = true; }
+    if(r[1] && r[1].length){ localStorage.setItem(LS_ACESSORIOS, JSON.stringify(r[1])); achou = true; }
+    if(r[2] && r[2].length){ localStorage.setItem(LS_PRODUTOS, JSON.stringify(r[2])); achou = true; }
+    if(r[3] && r[3].length){ localStorage.setItem(LS_AREAS, JSON.stringify(r[3])); achou = true; }
+    if(r[4] && r[4].length){ localStorage.setItem(LS_SOLUCOES, JSON.stringify(r[4])); achou = true; }
+    if(r[5] && r[5].length){ localStorage.setItem(LS_ITENS, JSON.stringify(r[5])); achou = true; }
+    if(r[6] && r[6].length){ localStorage.setItem(LS_KITS, JSON.stringify(r[6])); achou = true; }
+    if(r[7] && r[7].length){ localStorage.setItem(LS_ITENS_KIT, JSON.stringify(r[7])); achou = true; }
+    if(r[8] && r[8].length){ localStorage.setItem(LS_TIPOS, JSON.stringify(r[8])); achou = true; }
+    if(r[9] && r[9].length){ localStorage.setItem(LS_CLIENTES, JSON.stringify(r[9])); achou = true; }
+    if(r[10] && r[10].length){ localStorage.setItem(LS_CHAMADOS, JSON.stringify(r[10])); achou = true; }
     if(achou){ showToast('Dados recuperados da nuvem.'); render(); }
   }).catch(function(err){ console.warn('Falha ao hidratar da nuvem', err); });
 });
@@ -1452,9 +1523,15 @@ function uid(){ return Date.now().toString(36) + Math.random().toString(36).slic
 
 /* ===================== APP STATE ===================== */
 var state = {
-  view: 'dashboard',      // 'dashboard' | 'areas' | 'lista' | 'detalhe' | 'kits' | 'tipos' | 'clientes' | 'cliente-detalhe' | 'chamados'
+  view: 'dashboard',      // 'dashboard' | 'areas' | 'produtos' | 'lista' | 'detalhe' | 'kits' | 'tipos' | 'clientes' | 'cliente-detalhe' | 'chamados'
   solucaoAtualId: null,
   collapsed: {},          // ativoId -> true/false
+  produtoSegmentoFiltro: null,
+  editingProdutoCodigo: null,
+  editingProdutoAcessorioCodigo: null,
+  editingVarianteId: null,
+  varianteSegmentoAtual: null,
+  searchProdutos: '',
   editingAreaId: null,
   editingSolucaoId: null,
   editingAtivo: null,     // {id, solucaoId, paiId} or null when creating
@@ -1465,7 +1542,7 @@ var state = {
   filtroClientes: 'ativos', // 'ativos' | 'arquivados'
   editingChamadoId: null,
   filtroChamados: 'ativos', // 'ativos' | 'concluidos' | 'cancelados' | 'todos'
-  pendingDelete: null,     // {type:'area'|'solucao'|'ativo'|'kit'|'tipo'|'cliente'|'chamado', id, count}
+  pendingDelete: null,     // {type:'area'|'produto'|'solucao'|'ativo'|'kit'|'tipo'|'cliente'|'chamado', id, count}
   searchTerm: '',
   aplicarKit: null,       // {ativoId, kitsMatch, kitSelecionadoId}
   aplicarSolucoesClienteId: null,
@@ -1495,6 +1572,17 @@ var state = {
 /* ===================== NAV: TOPO (Dashboard / Segmentos / Kits / Tipos / Clientes / Chamados / Relatórios) ===================== */
 function irParaDashboard(){ state.view='dashboard'; render(); updateNavActive('dashboard'); }
 function irParaAreas(){ state.view='areas'; render(); updateNavActive('areas'); }
+function irParaProdutos(segmentoId){
+  state.view='produtos'; state.produtoSegmentoFiltro = segmentoId || null; render(); updateNavActive('produtos');
+  if(state.online && window.fenixMateriais){
+    window.fenixMateriais.listar().then(function(itens){
+      var cache = {};
+      (itens||[]).forEach(function(m){ if(m.codigoFabricante) cache[m.codigoFabricante] = m; });
+      state.materiaisCache = cache;
+      if(state.view === 'produtos') render();
+    }).catch(function(err){ console.warn('Fênix Core: falha ao listar materiais:', err); });
+  }
+}
 function irParaSolucoes(){ state.view='lista'; state.solucaoAtualId=null; state.searchTerm=''; render(); updateNavActive('solucoes'); }
 function irParaKits(){ state.view='kits'; render(); updateNavActive('kits'); }
 function irParaTipos(){ state.view='tipos'; render(); updateNavActive('tipos'); }
@@ -1654,6 +1742,8 @@ function render(){
     app.innerHTML = renderDashboard();
   } else if(state.view === 'areas'){
     app.innerHTML = renderListaAreas();
+  } else if(state.view === 'produtos'){
+    app.innerHTML = renderListaProdutos();
   } else if(state.view === 'lista'){
     app.innerHTML = renderListaSolucoes();
   } else if(state.view === 'clientes'){
@@ -1803,6 +1893,7 @@ function exportarManualPDF(){
 function renderDashboard(){
   var areas = loadAreas();
   var solucoesCatalogo = loadSolucoes().filter(function(s){ return !s.clienteId; });
+  var produtosVinculados = loadProdutos().length;
   var ativos = loadAtivos();
   var kits = loadKits();
   var tipos = loadTipos();
@@ -1813,6 +1904,12 @@ function renderDashboard(){
     var temFilhos = ativos.some(function(x){ return x.paiId === a.id; });
     return !temFilhos && !a.marca && !a.modelo && !a.serie;
   }).length;
+  var produtosTodos = loadProdutos();
+  var itensKitTodos = loadItensKit();
+  var segmentosSemArea = solucoesCatalogo.filter(function(s){ return !s.areaId; }).length;
+  var segmentosSemProduto = solucoesCatalogo.filter(function(s){ return !produtosTodos.some(function(p){ return p.segmentoId===s.id; }); }).length;
+  var kitsSemItens = kits.filter(function(k){ return !itensKitTodos.some(function(i){ return i.kitId===k.id; }); }).length;
+  var temAlerta = segmentosSemArea>0 || segmentosSemProduto>0 || kitsSemItens>0;
 
   var html = '';
   html += '<div class="toolbar">';
@@ -1838,11 +1935,23 @@ function renderDashboard(){
   html += statCard(chamadosAtivos, 'Chamado'+(chamadosAtivos===1?'':'s')+' em aberto', "irParaChamados()");
   html += statCard(areas.length, 'Solução'+(areas.length===1?'':'ões'), "irParaAreas()");
   html += statCard(solucoesCatalogo.length, 'Segmento'+(solucoesCatalogo.length===1?'':'s')+' no catálogo', "irParaSolucoes()");
+  html += statCard(produtosVinculados, 'Produto'+(produtosVinculados===1?'':'s')+' vinculado'+(produtosVinculados===1?'':'s'), "irParaProdutos()");
   html += statCard(ativos.length, 'Ativo'+(ativos.length===1?'':'s')+' cadastrados', "irParaSolucoes()");
   html += statCard(kits.length, 'Kit'+(kits.length===1?'':'s')+' de instalação', "irParaKits()");
   html += statCard(tipos.length, 'Família'+(tipos.length===1?'':'s')+' catalogada'+(tipos.length===1?'':'s'), "irParaTipos()");
   html += statCard(incompletos, 'Com dados incompletos', "irParaSolucoes()");
   html += '</div>';
+
+  if(temAlerta){
+    html += '<div class="hint" style="margin:16px 0;background:#FBF8ED;border:1px solid #E9E0AE;padding:12px 14px;border-radius:10px;">';
+    html += '  <b style="color:var(--alerta,#736504);">Saúde do cadastro</b>';
+    html += '  <div style="display:flex;flex-wrap:wrap;gap:16px;margin-top:6px;font-size:13px;">';
+    if(segmentosSemArea>0) html += '    <span style="cursor:pointer;" onclick="irParaSolucoes()">'+segmentosSemArea+' segmento'+(segmentosSemArea===1?'':'s')+' sem Solução</span>';
+    if(segmentosSemProduto>0) html += '    <span style="cursor:pointer;" onclick="irParaProdutos()">'+segmentosSemProduto+' segmento'+(segmentosSemProduto===1?'':'s')+' sem Produto vinculado</span>';
+    if(kitsSemItens>0) html += '    <span style="cursor:pointer;" onclick="irParaKits()">'+kitsSemItens+' kit'+(kitsSemItens===1?'':'s')+' sem itens</span>';
+    html += '  </div>';
+    html += '</div>';
+  }
 
   var recentes = solucoesCatalogo.slice().sort(function(a,b){ return new Date(b.criadoEm) - new Date(a.criadoEm); }).slice(0,6);
   if(recentes.length){
@@ -1872,6 +1981,7 @@ function renderListaSolucoes(){
   var solucoes = loadSolucoes().filter(function(s){ return !s.clienteId; });
   var ativos = loadAtivos();
   var areas = loadAreas();
+  var produtos = loadProdutos();
   var html = '';
   html += '<div class="toolbar">';
   html += '  <div><h1 class="page-title">Segmentos</h1><p class="page-sub" style="margin:0;">Catálogo/modelo de segmentos e seus ativos. Aplique num Segmento aqui, e depois use "+ Segmento" dentro de um Cliente pra copiá-lo pra ele.</p></div>';
@@ -1889,6 +1999,7 @@ function renderListaSolucoes(){
     html += '<div class="grid">';
     solucoes.forEach(function(s){
       var total = ativos.filter(function(a){ return a.solucaoId === s.id; }).length;
+      var totalProdutos = produtos.filter(function(p){ return p.segmentoId === s.id; }).length;
       var area = s.areaId ? areas.find(function(ar){ return ar.id === s.areaId; }) : null;
       html += '<div class="solucao-card" onclick="abrirSolucao(\''+s.id+'\')">';
       html += '  <div class="top">';
@@ -1896,7 +2007,8 @@ function renderListaSolucoes(){
       html += '  </div>';
       html += '  <p class="desc" style="margin:0 0 4px;font-size:12px;color:var(--muted,#736504);">'+(area ? escapeHtml(area.nome) : 'Sem Solução') + ' &gt; ' + escapeHtml(s.nome) + '</p>';
       html += '  <p class="desc">'+(s.descricao ? escapeHtml(s.descricao) : 'Sem descrição')+'</p>';
-      html += '  <span class="pill">'+total+' ativo'+(total===1?'':'s')+'</span>';
+      html += '  <span class="pill">'+total+' ativo'+(total===1?'':'s')+'</span> ';
+      html += '  <span class="pill" onclick="event.stopPropagation();irParaProdutos(\''+s.id+'\')" style="cursor:pointer;" title="Ver produtos vinculados">'+totalProdutos+' produto'+(totalProdutos===1?'':'s')+'</span>';
       html += '  <div class="actions" onclick="event.stopPropagation()">';
       html += '    <button class="btn btn-ghost btn-sm" onclick="openEditarSolucao(\''+s.id+'\')">Editar</button>';
       html += '    <button class="btn btn-ghost btn-sm" onclick="duplicarSolucao(\''+s.id+'\')" title="Criar uma cópia deste segmento, com todos os ativos, para usar como modelo">Duplicar</button>';
@@ -2648,9 +2760,36 @@ function renderDetalheSolucao(solucaoId){
   html += '  </div>';
   html += '  <div style="display:flex;gap:8px;flex-wrap:wrap;">';
   html += '    <button class="btn btn-ghost" onclick="exportarSolucaoPDF(\''+solucaoId+'\')">Exportar PDF</button>';
+  html += '    <button class="btn btn-ghost" onclick="irParaProdutos(\''+solucaoId+'\')">Produtos</button>';
   html += '    <button class="btn btn-ghost" onclick="abrirOrcamentoCliente(\''+solucaoId+'\')">Orçamento do Cliente</button>';
   html += '    <button class="btn btn-primary" onclick="openNovoAtivo(\''+solucaoId+'\', null)">+ Novo Ativo</button>';
   html += '  </div>';
+  html += '</div>';
+
+  var variantes = loadVariantes().filter(function(v){ return v.segmentoId === solucaoId; });
+  var produtosSeg = loadProdutos();
+  html += '<div class="card" style="margin-bottom:16px;padding:14px 16px;">';
+  html += '  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">';
+  html += '    <b>Variantes deste Segmento</b>';
+  html += '    <button class="btn btn-ghost btn-sm" onclick="openNovaVariante(\''+solucaoId+'\')">+ Variante</button>';
+  html += '  </div>';
+  if(variantes.length === 0){
+    html += '  <p class="hint" style="margin:8px 0 0;">Nenhuma variante ainda. Variante é a tecnologia/subtipo dentro do segmento (ex.: "CFTV IP", "CFTV HD") — opcional, use só se fizer sentido pra este segmento.</p>';
+  } else {
+    html += '  <div style="display:flex;flex-direction:column;gap:6px;margin-top:8px;">';
+    variantes.forEach(function(v){
+      var totalProd = produtosSeg.filter(function(p){ return p.varianteId===v.id; }).length;
+      html += '    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;padding:8px 10px;border:1px solid #E5E7F0;border-radius:8px;">';
+      html += '      <span>'+escapeHtml(v.nome)+' <span class="pill" style="margin-left:6px;">'+totalProd+' produto'+(totalProd===1?'':'s')+'</span></span>';
+      html += '      <span style="display:flex;gap:4px;flex-wrap:wrap;">';
+      html += '        <button class="btn btn-ghost btn-sm" onclick="openAdicionarProdutoVariante(\''+v.id+'\')">+ Produto</button>';
+      html += '        <button class="btn btn-ghost btn-sm" onclick="openEditarVariante(\''+v.id+'\')">Editar</button>';
+      html += '        <button class="btn btn-danger btn-sm" onclick="pedirExclusaoVariante(\''+v.id+'\')">Excluir</button>';
+      html += '      </span>';
+      html += '    </div>';
+    });
+    html += '  </div>';
+  }
   html += '</div>';
 
   if(total > 0){
@@ -2998,6 +3137,307 @@ function renderListaAreas(){
     html += '</div>';
   }
   return html;
+}
+
+/* ===================== PRODUTOS (referência ao catálogo mestre 'materiais') ===================== */
+var CAMPOS_PRODUTO_CONHECIDOS = ['codigoFabricante','tipo','marca','modelo','empresaId','id','criadoEm','atualizadoEm'];
+function descreverProduto(m){
+  var partes = [];
+  if(m.tipo) partes.push(m.tipo);
+  if(m.marca) partes.push(m.marca);
+  if(m.modelo) partes.push(m.modelo);
+  return partes.length ? partes.join(' · ') : 'Sem descrição no catálogo';
+}
+function camposExtrasProduto(m){
+  return Object.keys(m).filter(function(k){ return CAMPOS_PRODUTO_CONHECIDOS.indexOf(k)===-1 && m[k]!==undefined && m[k]!==null && m[k]!==''; });
+}
+function renderListaProdutos(){
+  var solucoes = loadSolucoes().filter(function(s){ return !s.clienteId; }).sort(function(a,b){ return a.nome.localeCompare(b.nome,'pt-BR'); });
+  var produtos = loadProdutos();
+  var cache = state.materiaisCache || {};
+  var codigos = Object.keys(cache);
+  var html = '';
+  html += '<div class="toolbar">';
+  html += '  <div><h1 class="page-title">Produtos</h1><p class="page-sub" style="margin:0;">Vem direto do catálogo mestre de materiais (compartilhado entre os apps Fênix). Aqui você só associa cada produto a um ou mais Segmentos — nada é duplicado nem alterado no catálogo.</p></div>';
+  html += '</div>';
+
+  if(!state.online){
+    html += '<div class="empty-state"><div class="glyph">📡</div><h3>Fique online pra consultar o catálogo</h3><p>A lista de produtos vem do catálogo mestre compartilhado (Fênix Core) e só carrega com conexão.</p></div>';
+    return html;
+  }
+  if(!window.fenixMateriais){
+    html += '<div class="empty-state"><div class="glyph">⏳</div><h3>Carregando conexão com o catálogo...</h3><p>Se essa mensagem persistir, saia e entre de novo na sua conta.</p></div>';
+    return html;
+  }
+
+  html += '<div class="toolbar-row">';
+  html += '  <div class="search-box">';
+  html += '    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>';
+  html += '    <input type="text" id="searchProdutos" placeholder="Buscar por código, tipo, marca ou modelo..." value="'+escapeHtmlAttr(state.searchProdutos||'')+'" oninput="onSearchProdutosInput(this)">';
+  html += '  </div>';
+  html += '  <select id="filtroSegmentoProdutos" onchange="onFiltroSegmentoProdutos(this)" style="max-width:260px;">';
+  html += '    <option value="">Todos os produtos do catálogo</option>';
+  solucoes.forEach(function(s){
+    html += '    <option value="'+s.id+'"'+(state.produtoSegmentoFiltro===s.id?' selected':'')+'>Somente do segmento: '+escapeHtml(s.nome)+'</option>';
+  });
+  html += '  </select>';
+  html += '</div>';
+
+  if(codigos.length === 0){
+    html += '<div class="empty-state"><div class="glyph">📦</div><h3>Nenhum produto no catálogo ainda</h3><p>O catálogo de materiais é alimentado conforme os técnicos preenchem o Código do Fabricante nos Ativos, em qualquer app Fênix.</p></div>';
+    return html;
+  }
+
+  var termo = (state.searchProdutos||'').trim().toLowerCase();
+  var filtroSegmento = state.produtoSegmentoFiltro;
+  var segmentosPorCodigo = {};
+  produtos.forEach(function(p){
+    if(!segmentosPorCodigo[p.codigoFabricante]) segmentosPorCodigo[p.codigoFabricante] = [];
+    segmentosPorCodigo[p.codigoFabricante].push(p.segmentoId);
+  });
+
+  var listaFiltrada = codigos.filter(function(cod){
+    if(filtroSegmento && (segmentosPorCodigo[cod]||[]).indexOf(filtroSegmento) === -1) return false;
+    if(!termo) return true;
+    var m = cache[cod];
+    var alvo = (cod+' '+(m.tipo||'')+' '+(m.marca||'')+' '+(m.modelo||'')).toLowerCase();
+    return alvo.indexOf(termo) !== -1;
+  }).sort(function(a,b){ return a.localeCompare(b,'pt-BR'); });
+
+  html += '<p class="hint" style="margin:0 0 10px;">'+listaFiltrada.length+' de '+codigos.length+' produto'+(codigos.length===1?'':'s')+' no catálogo'+(filtroSegmento?' · filtrado por segmento':'')+'</p>';
+
+  if(listaFiltrada.length === 0){
+    html += '<div class="empty-state"><div class="glyph">🔎</div><h3>Nada encontrado</h3><p>Ajuste a busca ou o filtro de segmento.</p></div>';
+    return html;
+  }
+
+  html += '<div class="grid">';
+  listaFiltrada.slice(0,120).forEach(function(cod){
+    var m = cache[cod];
+    var vinculos = (segmentosPorCodigo[cod]||[]).map(function(sid){
+      var s = solucoes.find(function(x){ return x.id===sid; });
+      return s ? s.nome : null;
+    }).filter(Boolean);
+    var extras = camposExtrasProduto(m);
+    html += '<div class="solucao-card">';
+    html += '  <div class="top"><h3 style="font-size:15px;">'+escapeHtml(cod)+'</h3></div>';
+    html += '  <p class="desc">'+escapeHtml(descreverProduto(m))+'</p>';
+    if(extras.length){
+      html += '  <p class="desc" style="font-size:11px;color:var(--muted,#736504);">'+extras.slice(0,4).map(function(k){ return escapeHtml(k)+': '+escapeHtml(String(m[k])); }).join(' · ')+'</p>';
+    }
+    if(vinculos.length){
+      html += '  <span class="pill" title="'+escapeHtmlAttr(vinculos.join(', '))+'">'+vinculos.length+' segmento'+(vinculos.length===1?'':'s')+' vinculado'+(vinculos.length===1?'':'s')+'</span>';
+    } else {
+      html += '  <span class="pill" style="opacity:.6;">Não classificado</span>';
+    }
+    var variantesDoCod = loadVariantes().filter(function(v){ return produtos.some(function(p){ return p.codigoFabricante===cod && p.varianteId===v.id; }); }).map(function(v){ return v.nome; });
+    if(variantesDoCod.length){
+      html += '  <p class="desc" style="font-size:11px;">Variante: '+escapeHtml(variantesDoCod.join(', '))+'</p>';
+    }
+    var qtdAcessorios = loadAcessorios().filter(function(a){ return a.produtoCodigo===cod; }).length;
+    html += '  <div class="actions">';
+    html += '    <button class="btn btn-ghost btn-sm" onclick="openAssociarProduto(\''+escapeHtmlAttr(cod)+'\')">Vincular a Segmentos</button>';
+    html += '    <button class="btn btn-ghost btn-sm" onclick="openGerenciarAcessorios(\''+escapeHtmlAttr(cod)+'\')">Acessórios'+(qtdAcessorios?' ('+qtdAcessorios+')':'')+'</button>';
+    html += '  </div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  if(listaFiltrada.length > 120){
+    html += '<p class="hint">Mostrando os 120 primeiros. Use a busca pra refinar.</p>';
+  }
+  return html;
+}
+function onSearchProdutosInput(el){ state.searchProdutos = el.value; render(); setTimeout(function(){ var i=document.getElementById('searchProdutos'); if(i){ i.focus(); i.setSelectionRange(i.value.length,i.value.length); } },0); }
+function onFiltroSegmentoProdutos(el){ state.produtoSegmentoFiltro = el.value || null; render(); }
+function openAssociarProduto(codigo){
+  var m = (state.materiaisCache||{})[codigo];
+  if(!m) return;
+  state.editingProdutoCodigo = codigo;
+  document.getElementById('mpTitle').textContent = 'Vincular: ' + codigo;
+  document.getElementById('mpSub').textContent = descreverProduto(m) + '. Marque em quais Segmentos este produto é usado — pode marcar mais de um.';
+  var solucoes = loadSolucoes().filter(function(s){ return !s.clienteId; }).sort(function(a,b){ return a.nome.localeCompare(b.nome,'pt-BR'); });
+  var associados = loadProdutos().filter(function(p){ return p.codigoFabricante===codigo; }).map(function(p){ return p.segmentoId; });
+  var listaEl = document.getElementById('mpLista');
+  if(solucoes.length === 0){
+    listaEl.innerHTML = '<p class="hint">Nenhum Segmento cadastrado ainda. Crie um em "Segmentos" primeiro.</p>';
+  } else {
+    listaEl.innerHTML = solucoes.map(function(s){
+      var marcado = associados.indexOf(s.id) !== -1;
+      return '<label style="display:flex;align-items:center;gap:8px;padding:6px 8px;border:1px solid #E5E7F0;border-radius:8px;cursor:pointer;">'+
+        '<input type="checkbox" data-segmento-id="'+s.id+'"'+(marcado?' checked':'')+'> '+escapeHtml(s.nome)+
+        '</label>';
+    }).join('');
+  }
+  openModal('modalAssociarProduto');
+}
+function salvarAssociacoesProduto(){
+  var codigo = state.editingProdutoCodigo;
+  if(!codigo) return;
+  var checkboxes = document.querySelectorAll('#mpLista input[type="checkbox"]');
+  var marcados = [];
+  checkboxes.forEach(function(cb){ if(cb.checked) marcados.push(cb.getAttribute('data-segmento-id')); });
+  var produtos = loadProdutos();
+  var outros = produtos.filter(function(p){ return p.codigoFabricante !== codigo; });
+  var novos = marcados.map(function(segmentoId){
+    var existente = produtos.find(function(p){ return p.codigoFabricante===codigo && p.segmentoId===segmentoId; });
+    return existente || { id: uid(), codigoFabricante: codigo, segmentoId: segmentoId, criadoEm: new Date().toISOString() };
+  });
+  saveProdutos(outros.concat(novos));
+  closeModal('modalAssociarProduto');
+  showToast('Vínculos salvos.');
+  render();
+}
+
+/* ===================== PRODUTOS DENTRO DE UMA VARIANTE ===================== */
+function openAdicionarProdutoVariante(varianteId){
+  var v = loadVariantes().find(function(x){ return x.id===varianteId; });
+  if(!v) return;
+  state.editingVarianteProdutoId = varianteId;
+  document.getElementById('mavTitle').textContent = 'Produtos da variante: ' + v.nome;
+  document.getElementById('mavBusca').value = '';
+  renderListaProdutoVariantePicker('');
+  openModal('modalProdutoVariante');
+}
+function filtrarListaProdutoVariante(){
+  renderListaProdutoVariantePicker(document.getElementById('mavBusca').value || '');
+}
+function renderListaProdutoVariantePicker(termo){
+  var varianteId = state.editingVarianteProdutoId;
+  var cache = state.materiaisCache || {};
+  var selecionados = loadProdutos().filter(function(p){ return p.varianteId===varianteId; }).map(function(p){ return p.codigoFabricante; });
+  termo = termo.trim().toLowerCase();
+  var codigos = Object.keys(cache).filter(function(cod){
+    if(!termo) return selecionados.indexOf(cod) !== -1;
+    var m = cache[cod];
+    var alvo = (cod+' '+(m.tipo||'')+' '+(m.marca||'')+' '+(m.modelo||'')).toLowerCase();
+    return alvo.indexOf(termo) !== -1;
+  }).sort(function(a,b){ return a.localeCompare(b,'pt-BR'); }).slice(0,60);
+
+  if(codigos.length === 0){
+    document.getElementById('mavLista').innerHTML = '<p class="hint">'+(termo ? 'Nada encontrado.' : 'Nenhum produto nesta variante ainda — use a busca acima.')+'</p>';
+    return;
+  }
+  document.getElementById('mavLista').innerHTML = codigos.map(function(cod){
+    var m = cache[cod];
+    var marcado = selecionados.indexOf(cod) !== -1;
+    return '<label style="display:flex;align-items:center;gap:8px;padding:6px 8px;border:1px solid #E5E7F0;border-radius:8px;cursor:pointer;">'+
+      '<input type="checkbox" onchange="toggleProdutoVariante(\''+escapeHtmlAttr(cod)+'\', this.checked)" '+(marcado?'checked':'')+'> '+
+      '<span>'+escapeHtml(cod)+' — '+escapeHtml(descreverProduto(m))+'</span>'+
+      '</label>';
+  }).join('');
+}
+function toggleProdutoVariante(codigo, marcado){
+  var varianteId = state.editingVarianteProdutoId;
+  var v = loadVariantes().find(function(x){ return x.id===varianteId; });
+  if(!v) return;
+  var produtos = loadProdutos();
+  if(marcado){
+    var jaNaVariante = produtos.some(function(p){ return p.codigoFabricante===codigo && p.varianteId===varianteId; });
+    if(!jaNaVariante){
+      var plain = produtos.find(function(p){ return p.codigoFabricante===codigo && p.segmentoId===v.segmentoId && !p.varianteId; });
+      if(plain){ plain.varianteId = varianteId; }
+      else { produtos.push({ id: uid(), codigoFabricante: codigo, segmentoId: v.segmentoId, varianteId: varianteId, criadoEm: new Date().toISOString() }); }
+    }
+  } else {
+    produtos = produtos.filter(function(p){ return !(p.codigoFabricante===codigo && p.varianteId===varianteId); });
+  }
+  saveProdutos(produtos);
+}
+
+/* ===================== VARIANTE (tecnologia/subtipo dentro do Segmento) ===================== */
+function openNovaVariante(segmentoId){
+  state.editingVarianteId = null;
+  state.varianteSegmentoAtual = segmentoId;
+  document.getElementById('mvTitle').textContent = 'Nova Variante';
+  document.getElementById('mvNome').value = '';
+  openModal('modalVariante');
+}
+function openEditarVariante(id){
+  var v = loadVariantes().find(function(x){ return x.id===id; });
+  if(!v) return;
+  state.editingVarianteId = id;
+  state.varianteSegmentoAtual = v.segmentoId;
+  document.getElementById('mvTitle').textContent = 'Editar Variante';
+  document.getElementById('mvNome').value = v.nome;
+  openModal('modalVariante');
+}
+function salvarVariante(){
+  var nome = document.getElementById('mvNome').value.trim();
+  if(!nome){ showToast('Informe o nome da variante.'); return; }
+  var variantes = loadVariantes();
+  if(state.editingVarianteId){
+    var v = variantes.find(function(x){ return x.id===state.editingVarianteId; });
+    v.nome = nome;
+  } else {
+    var duplicado = variantes.some(function(x){ return x.segmentoId===state.varianteSegmentoAtual && x.nome.trim().toLowerCase()===nome.trim().toLowerCase(); });
+    if(duplicado){ showToast('Já existe uma variante com esse nome neste segmento.'); return; }
+    variantes.push({ id: uid(), segmentoId: state.varianteSegmentoAtual, nome: nome, criadoEm: new Date().toISOString() });
+  }
+  saveVariantes(variantes);
+  closeModal('modalVariante');
+  showToast('Variante salva.');
+  render();
+}
+function pedirExclusaoVariante(id){
+  var vinculados = loadProdutos().filter(function(p){ return p.varianteId===id; }).length;
+  state.pendingDelete = { type:'variante', id:id };
+  document.getElementById('excluirMsg').textContent = vinculados > 0
+    ? 'Isso vai apagar a variante. ' + vinculados + ' produto(s) vinculado(s) a ela continuam vinculados ao Segmento, só perdem a variante específica.'
+    : 'Isso vai apagar a variante, de forma definitiva.';
+  document.getElementById('excluirConfirmInput').value='';
+  document.getElementById('btnConfirmExcluir').disabled = true;
+  openModal('modalExcluir');
+}
+
+/* ===================== ACESSÓRIOS (complemento direto de um Produto) ===================== */
+function openGerenciarAcessorios(codigoProduto){
+  state.editingProdutoAcessorioCodigo = codigoProduto;
+  var m = (state.materiaisCache||{})[codigoProduto];
+  document.getElementById('maccTitle').textContent = 'Acessórios de: ' + codigoProduto;
+  document.getElementById('maccSub').textContent = (m ? descreverProduto(m) : '') + '. Marque os itens do catálogo que são complementos deste produto (ex.: fonte, switch PoE).';
+  document.getElementById('maccBusca').value = '';
+  renderListaAcessoriosPicker('');
+  openModal('modalAcessorios');
+}
+function filtrarListaAcessorios(){
+  renderListaAcessoriosPicker(document.getElementById('maccBusca').value || '');
+}
+function renderListaAcessoriosPicker(termo){
+  var codigoProduto = state.editingProdutoAcessorioCodigo;
+  var cache = state.materiaisCache || {};
+  var selecionados = loadAcessorios().filter(function(a){ return a.produtoCodigo===codigoProduto; }).map(function(a){ return a.acessorioCodigo; });
+  termo = termo.trim().toLowerCase();
+  var codigos = Object.keys(cache).filter(function(cod){
+    if(cod === codigoProduto) return false;
+    if(!termo) return selecionados.indexOf(cod) !== -1; // sem busca, mostra só os já marcados (lista curta)
+    var m = cache[cod];
+    var alvo = (cod+' '+(m.tipo||'')+' '+(m.marca||'')+' '+(m.modelo||'')).toLowerCase();
+    return alvo.indexOf(termo) !== -1;
+  }).sort(function(a,b){ return a.localeCompare(b,'pt-BR'); }).slice(0,60);
+
+  if(codigos.length === 0){
+    document.getElementById('maccLista').innerHTML = '<p class="hint">'+(termo ? 'Nada encontrado.' : 'Nenhum acessório marcado ainda — use a busca acima pra encontrar um item do catálogo.')+'</p>';
+    return;
+  }
+  document.getElementById('maccLista').innerHTML = codigos.map(function(cod){
+    var m = cache[cod];
+    var marcado = selecionados.indexOf(cod) !== -1;
+    return '<label style="display:flex;align-items:center;gap:8px;padding:6px 8px;border:1px solid #E5E7F0;border-radius:8px;cursor:pointer;">'+
+      '<input type="checkbox" onchange="toggleAcessorio(\''+escapeHtmlAttr(cod)+'\', this.checked)" '+(marcado?'checked':'')+'> '+
+      '<span>'+escapeHtml(cod)+' — '+escapeHtml(descreverProduto(m))+'</span>'+
+      '</label>';
+  }).join('');
+}
+function toggleAcessorio(codigoAcessorio, marcado){
+  var codigoProduto = state.editingProdutoAcessorioCodigo;
+  var acessorios = loadAcessorios();
+  if(marcado){
+    var jaExiste = acessorios.some(function(a){ return a.produtoCodigo===codigoProduto && a.acessorioCodigo===codigoAcessorio; });
+    if(!jaExiste) acessorios.push({ id: uid(), produtoCodigo: codigoProduto, acessorioCodigo: codigoAcessorio, criadoEm: new Date().toISOString() });
+  } else {
+    acessorios = acessorios.filter(function(a){ return !(a.produtoCodigo===codigoProduto && a.acessorioCodigo===codigoAcessorio); });
+  }
+  saveAcessorios(acessorios);
 }
 
 function clonarAtivosDeSolucao(origSolucaoId, novaSolucaoId){
@@ -3962,7 +4402,13 @@ function checkExcluirWord(){
 }
 function confirmarExclusao(){
   if(!state.pendingDelete) return;
-  if(state.pendingDelete.type === 'area'){
+  if(state.pendingDelete.type === 'variante'){
+    var id = state.pendingDelete.id;
+    saveVariantes(loadVariantes().filter(function(v){ return v.id!==id; }));
+    closeModal('modalExcluir');
+    showToast('Variante excluída.');
+    render();
+  } else if(state.pendingDelete.type === 'area'){
     var id = state.pendingDelete.id;
     saveAreas(loadAreas().filter(function(a){ return a.id!==id; }));
     closeModal('modalExcluir');
@@ -4221,6 +4667,9 @@ function exportarBackup(){
   var dados = {
     fenixAtivosBackup: true,
     exportadoEm: new Date().toISOString(),
+    variantes: loadVariantes(),
+    acessorios: loadAcessorios(),
+    produtos: loadProdutos(),
     areas: loadAreas(),
     solucoes: loadSolucoes(),
     ativos: loadAtivos(),
@@ -4255,6 +4704,9 @@ function onArquivoBackupSelecionado(e){
       if(!dados || typeof dados !== 'object') throw new Error('formato inválido');
       backupPendente = dados;
       var resumo = 'Este arquivo contém: ' +
+        (dados.variantes||[]).length + ' variante(s), ' +
+        (dados.acessorios||[]).length + ' acessório(s), ' +
+        (dados.produtos||[]).length + ' associação(ões) de produto, ' +
         (dados.areas||[]).length + ' solução(ões), ' +
         (dados.solucoes||[]).length + ' segmento(ões), ' +
         (dados.ativos||[]).length + ' ativo(s), ' +
@@ -4279,6 +4731,9 @@ function checkImportarBackupWord(){
 }
 function confirmarImportarBackup(){
   if(!backupPendente) return;
+  if(backupPendente.variantes) localStorage.setItem(LS_VARIANTES, JSON.stringify(backupPendente.variantes));
+  if(backupPendente.acessorios) localStorage.setItem(LS_ACESSORIOS, JSON.stringify(backupPendente.acessorios));
+  if(backupPendente.produtos) localStorage.setItem(LS_PRODUTOS, JSON.stringify(backupPendente.produtos));
   if(backupPendente.areas) localStorage.setItem(LS_AREAS, JSON.stringify(backupPendente.areas));
   if(backupPendente.solucoes) localStorage.setItem(LS_SOLUCOES, JSON.stringify(backupPendente.solucoes));
   if(backupPendente.ativos) localStorage.setItem(LS_ITENS, JSON.stringify(backupPendente.ativos));
@@ -4335,7 +4790,75 @@ function showToast(msg){
   toastTimer = setTimeout(function(){ t.classList.remove('show'); }, 2600);
 }
 
+/* ===================== MENU LATERAL PERSONALIZÁVEL ===================== */
+var MENU_ITENS = [
+  { id:'dashboard', label:'Dashboard', onclick:'irParaDashboard()', icone:'<rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/>' },
+  { id:'chamados', label:'Chamados', onclick:'irParaChamados()', icone:'<path d="M14 3v5h5"/><path d="M6 3h8l6 6v11a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/>' },
+  { id:'clientes', label:'Clientes', onclick:'irParaClientes()', icone:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>' },
+  { id:'equipe', label:'Equipe', onclick:'irParaEquipe()', icone:'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>' },
+  { id:'areas', label:'Soluções', onclick:'irParaAreas()', icone:'<path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>' },
+  { id:'solucoes', label:'Segmentos', onclick:'irParaSolucoes()', icone:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>' },
+  { id:'produtos', label:'Produtos', onclick:'irParaProdutos()', icone:'<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.27 6.96 12 12l8.73-5.04"/><path d="M12 22.08V12"/>' },
+  { id:'tipos', label:'Famílias', onclick:'irParaTipos()', icone:'<path d="M4 4h6v6H4z"/><path d="M14 4h6v6h-6z"/><path d="M4 14h6v6H4z"/><path d="M14 14h6v6h-6z"/>' },
+  { id:'kits', label:'Kits', onclick:'irParaKits()', icone:'<path d="M20 7L12 3 4 7v10l8 4 8-4V7z"/><path d="M4 7l8 4 8-4"/><path d="M12 11v10"/>' },
+  { id:'relatorios', label:'Relatórios', onclick:'irParaRelatorios()', icone:'<path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/>' }
+];
+function ordemMenuAtual(){
+  var salva = [];
+  try{ salva = JSON.parse(localStorage.getItem(LS_MENU_ORDEM)) || []; }catch(e){ salva = []; }
+  var idsValidos = MENU_ITENS.map(function(m){ return m.id; });
+  var ordenado = salva.filter(function(id){ return idsValidos.indexOf(id) !== -1; });
+  idsValidos.forEach(function(id){ if(ordenado.indexOf(id)===-1) ordenado.push(id); }); // itens novos entram no fim
+  return ordenado;
+}
+function renderSidebarNav(){
+  var ordem = ordemMenuAtual();
+  var html = ordem.map(function(id){
+    var item = MENU_ITENS.find(function(m){ return m.id === id; });
+    if(!item) return '';
+    return '<div class="nav-item" data-section="'+item.id+'" onclick="'+item.onclick+'"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">'+item.icone+'</svg>'+item.label+'</div>';
+  }).join('');
+  document.getElementById('navItemsContainer').innerHTML = html;
+}
+function abrirPersonalizarMenu(){
+  renderListaOrdemMenu();
+  openModal('modalMenu');
+}
+function renderListaOrdemMenu(){
+  var ordem = ordemMenuAtual();
+  var html = ordem.map(function(id, idx){
+    var item = MENU_ITENS.find(function(m){ return m.id === id; });
+    if(!item) return '';
+    return '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border:1px solid #E5E7F0;border-radius:8px;">'+
+      '<span>'+escapeHtml(item.label)+'</span>'+
+      '<span style="display:flex;gap:4px;">'+
+      '<button class="btn btn-ghost btn-sm" onclick="moverItemMenu(\''+id+'\',-1)" '+(idx===0?'disabled':'')+' title="Mover pra cima">▲</button>'+
+      '<button class="btn btn-ghost btn-sm" onclick="moverItemMenu(\''+id+'\',1)" '+(idx===ordem.length-1?'disabled':'')+' title="Mover pra baixo">▼</button>'+
+      '</span></div>';
+  }).join('');
+  document.getElementById('menuOrdemLista').innerHTML = html;
+}
+function moverItemMenu(id, direcao){
+  var ordem = ordemMenuAtual();
+  var i = ordem.indexOf(id);
+  var j = i + direcao;
+  if(i<0 || j<0 || j>=ordem.length) return;
+  var tmp = ordem[i]; ordem[i] = ordem[j]; ordem[j] = tmp;
+  localStorage.setItem(LS_MENU_ORDEM, JSON.stringify(ordem));
+  renderSidebarNav();
+  updateNavActive(state.view === 'lista' || state.view === 'detalhe' ? 'solucoes' : state.view);
+  renderListaOrdemMenu();
+}
+function restaurarOrdemMenuPadrao(){
+  localStorage.removeItem(LS_MENU_ORDEM);
+  renderSidebarNav();
+  updateNavActive(state.view === 'lista' || state.view === 'detalhe' ? 'solucoes' : state.view);
+  renderListaOrdemMenu();
+  showToast('Ordem padrão restaurada.');
+}
+
 /* ===================== INIT ===================== */
+renderSidebarNav();
 render();
 updateNavActive('dashboard');
 updateOnlineStatus();
